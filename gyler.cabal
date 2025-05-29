@@ -25,6 +25,7 @@ library
   build-depends:      ,base >=4.7 && <5
                       ,process
                       ,bytestring
+                      ,text
                       ,directory
                       ,time
 
@@ -42,6 +43,7 @@ test-suite gyler-tests
                       ,gyler
                       ,hspec
                       ,bytestring
+                      ,text
                       ,directory
                       ,process
                       ,temporary
