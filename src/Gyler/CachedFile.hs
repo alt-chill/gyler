@@ -3,6 +3,7 @@ module Gyler.CachedFile (
     ,newFile
     ,newFileDefault
     ,getValue
+    ,writeValue
 ) where
 
 import Gyler.CachedFile.Internal

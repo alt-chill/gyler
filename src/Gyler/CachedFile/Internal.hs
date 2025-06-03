@@ -7,6 +7,7 @@ module Gyler.CachedFile.Internal (
     ,fileAge
     ,isFileFresh
     ,readContent
+    ,writeValue
 ) where
 
 import Data.IORef (IORef, writeIORef, newIORef, readIORef)
@@ -87,3 +88,13 @@ getValue file = do
                            then readContent file    -- load from disk
                            else return Nothing      -- nothing in cache
         v@(Just val) -> return v                    -- cached value
+
+-- Writes value to cache and into file
+-- Doing nothing if write is failed
+writeValue :: CachedFile -> T.Text -> IO ()
+writeValue file value = do
+    let handler :: IOException -> IO ()
+        handler _ = return ()
+
+    writeIORef (cache file) (Just value)
+    T.writeFile (filePath file) value `catch` handler
