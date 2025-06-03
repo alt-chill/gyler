@@ -59,13 +59,17 @@ isFileFresh file = do
 
 -- Reads file content from disk and caches it.
 -- Returns an Nothing if reading fails (e.g., file not found).
+-- Do not clean the cache if reading fails
 readContent :: CachedFile -> IO (Maybe T.Text)
 readContent file  = do
     let handler :: IOException -> IO (Maybe T.Text)
         handler _ = return Nothing
 
     content <- fmap Just (T.readFile (filePath file)) `catch` handler
-    writeIORef (cache file) content
+
+    case content of
+        Just _  -> writeIORef (cache file) content
+        Nothing -> pure ()
 
     return content
 
