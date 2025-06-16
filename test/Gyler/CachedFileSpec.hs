@@ -5,14 +5,20 @@ module Gyler.CachedFileSpec (spec) where
 import Gyler.CachedFile.Internal
 
 import Test.Hspec
-import System.IO.Temp (withSystemTempFile)
+
 import qualified Data.Text    as T (Text)
+
 import System.Directory (getModificationTime, removeFile)
-import Control.Concurrent (threadDelay)
-import Data.Time.Clock (getCurrentTime, addUTCTime, diffUTCTime)
 import System.Process (callProcess)
 import System.IO (hClose, hPutStr, hPutStrLn)
+import System.IO.Temp (withSystemTempFile)
+
 import Data.IORef (writeIORef)
+import Data.Either (isLeft)
+import Data.Time.Clock (getCurrentTime, addUTCTime, diffUTCTime, NominalDiffTime (..))
+
+import Control.Exception (try)
+import Control.Concurrent (threadDelay)
 
 spec :: Spec
 spec = describe "Gyler.CachedFile" $ do
@@ -140,3 +146,45 @@ spec = describe "Gyler.CachedFile" $ do
             file <- newFileDefault fp
             value <- getValue file
             value `shouldBe` Just ""
+
+    it "writeValue updates both cache and file content" $
+        withSystemTempFile "test.txt" $ \fp h -> do
+            hClose h
+            file <- newFileDefault fp
+            writeValue file "written"
+            content <- readFile fp
+            cached <- getCachedContent file
+            content `shouldBe` "written"
+            cached `shouldBe` Just "written"
+
+    it "writeValue catches exception and still updates cache" $ do
+        let path = "/forbidden"
+        file <- newFileDefault path
+        writeValue file "shouldNotFail"
+        cached <- getCachedContent file
+        cached `shouldBe` Just "shouldNotFail"
+
+    it "readContent returns Nothing for missing file" $ do
+        file <- newFileDefault "nonexistent.txt"
+        value <- readContent file
+        value `shouldBe` Nothing
+
+    it "fileAge throws exception for nonexistent file" $ do
+        file <- newFileDefault "nonexistent.txt"
+        result <- try (fileAge file) :: IO (Either IOError NominalDiffTime)
+        result `shouldSatisfy` isLeft
+
+    it "readContent does not clear cache if reading fails" $
+        withSystemTempFile "test.txt" $ \fp h -> do
+            hPutStr h "good"
+            hClose h
+
+            file <- newFileDefault fp
+            _ <- readContent file
+
+            removeFile fp
+            failed <- readContent file
+            cached <- getCachedContent file
+
+            cached `shouldBe` Just "good"
+            failed `shouldBe` Nothing
