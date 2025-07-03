@@ -18,7 +18,9 @@ common warnings
 
 library
   exposed-modules:     Gyler.CachedFile
-                       Gyler.CachedFile.Internal
+                      ,Gyler.CachedFile.Internal
+
+                      ,Gyler.Types
 
   hs-source-dirs:      src
 
@@ -28,6 +30,8 @@ library
                       ,text
                       ,directory
                       ,time
+                      ,filepath
+                      ,typed-process
 
   default-language:    Haskell2010
 

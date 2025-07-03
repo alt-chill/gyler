@@ -4,6 +4,7 @@ module Gyler.CachedFile (
     ,newFileDefault
     ,readCached
     ,writeValue
+    ,fetchOrRun
 ) where
 
 import Gyler.CachedFile.Internal

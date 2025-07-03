@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Gyler.CachedFile.Internal (
     CachedFile (..)
     ,newFile
@@ -8,16 +10,25 @@ module Gyler.CachedFile.Internal (
     ,isFileFresh
     ,readContent
     ,writeValue
+    ,fetchOrRun
 ) where
 
 import Data.IORef (IORef, writeIORef, newIORef, readIORef)
 import Data.Time.Clock  (NominalDiffTime, diffUTCTime, getCurrentTime)
 
-import qualified Data.Text as T (Text)
+import qualified Data.Text as T (Text, pack, unpack)
 import qualified Data.Text.IO as T (hGetContents, writeFile, readFile)
 
 import System.Directory (getModificationTime)
-import Control.Exception (try, catch, IOException, evaluate)
+import Control.Exception (try, catch, IOException, evaluate, SomeException (..))
+
+import System.Process.Typed (proc, readProcessStdout_)
+
+import qualified Data.Text.Encoding as T (decodeUtf8')
+import qualified Data.ByteString as BS (ByteString)
+import qualified Data.ByteString.Lazy as BL (ByteString, toStrict)
+
+import Gyler.Types
 
 data CachedFile = CachedFile {
     filePath :: !FilePath,
@@ -98,3 +109,31 @@ writeValue file value = do
 
     writeIORef (cache file) (Just value)
     T.writeFile (filePath file) value `catch` handler
+
+-- | Attempts to retrieve a cached value.
+-- If not available or stale, runs the external command and captures its stdout.
+-- The result is saved in the file and returned.
+-- If the command fails or decoding fails, returns an empty string.
+fetchOrRun :: CachedFile -> Cmd -> IO T.Text
+fetchOrRun file (exec, args) = do
+    cached <- readCached file
+    case cached of
+        Just val -> return val
+        Nothing -> do
+            result <- tryRunProcess
+            case result of
+                Just output -> do
+                    writeValue file output
+                    return output
+                Nothing -> return ""
+  where
+    tryRunProcess :: IO (Maybe T.Text)
+    tryRunProcess = do
+        let process = proc (T.unpack exec) (map T.unpack args)
+        result <- try (readProcessStdout_  process) :: IO (Either SomeException BL.ByteString)
+        return $ case result of
+            Left _ -> Nothing
+            Right outBS ->
+                case T.decodeUtf8' (BL.toStrict outBS) of
+                    Right txt -> Just txt
+                    Left _    -> Nothing
