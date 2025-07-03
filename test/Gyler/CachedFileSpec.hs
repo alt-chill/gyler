@@ -20,6 +20,8 @@ import Data.Time.Clock (getCurrentTime, addUTCTime, diffUTCTime, NominalDiffTime
 import Control.Exception (try)
 import Control.Concurrent (threadDelay)
 
+import TestUtils (withTempFilePath)
+
 spec :: Spec
 spec = describe "Gyler.CachedFile" $ do
     it "newFileDefault initializes with empty cache" $ do
@@ -140,16 +142,16 @@ spec = describe "Gyler.CachedFile" $ do
 
             diff `shouldSatisfy` (< 1)
 
-    it "getValue returns Just \"\" for empty file" $
+    it "readCached returns Just \"\" for empty file" $
         withSystemTempFile "test.txt" $ \fp h -> do
             hClose h
+
             file <- newFileDefault fp
-            value <- getValue file
+            value <- readCached file
             value `shouldBe` Just ""
 
     it "writeValue updates both cache and file content" $
-        withSystemTempFile "test.txt" $ \fp h -> do
-            hClose h
+        withTempFilePath $ \fp -> do
             file <- newFileDefault fp
             writeValue file "written"
             content <- readFile fp
@@ -188,3 +190,62 @@ spec = describe "Gyler.CachedFile" $ do
 
             cached `shouldBe` Just "good"
             failed `shouldBe` Nothing
+
+    it "fetchOrRun returns cached value if present" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            writeValue file "cached!"
+            out <- fetchOrRun file ("echo", ["ignored"])
+            out `shouldBe` "cached!"
+
+    it "fetchOrRun runs command and caches output if no cache is present" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out1 <- fetchOrRun file ("echo", ["hello"])
+            out1 `shouldBe` "hello\n"
+
+            -- file should now contain the same content
+            content <- readFile fp
+            content `shouldBe` "hello\n"
+
+            -- second call should return cached value (even if echo would output something else)
+            out2 <- fetchOrRun file ("echo", ["ignored"])
+            out2 `shouldBe` "hello\n"
+
+    it "fetchOrRun runs command and return output if file is not available" $ do
+        file <- newFileDefault "/non/existing/dir/file.txt"
+        out1 <- fetchOrRun file ("echo", ["hello"])
+        out1 `shouldBe` "hello\n"
+
+    it "fetchOrRun returns empty string if command fails" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out <- fetchOrRun file ("false", [])
+            out `shouldBe` ""
+
+    it "fetchOrRun caches empty output properly" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out <- fetchOrRun file ("true", [])
+            out `shouldBe` ""
+            cached <- getCachedContent file
+            cached `shouldBe` Just ""
+
+    it "fetchOrRun runs command if file is stale" $
+        withSystemTempFile "test.txt" $ \fp h -> do
+            hPutStr h "stale"
+            hClose h
+
+            file <- newFile fp 0.001
+            threadDelay 10000  -- make file stale
+
+            out <- fetchOrRun file ("echo", ["fresh"])
+            out `shouldBe` "fresh\n"
+
+    it "fetchOrRun returns \"\" if output is not valid UTF-8" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+
+            -- head -c 1000 /dev/urandom gives random bytes (may be invalid UTF-8)
+            out <- fetchOrRun file ("head", ["-c", "1000", "/dev/urandom"])
+            out `shouldBe` ""
