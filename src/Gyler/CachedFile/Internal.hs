@@ -2,7 +2,7 @@ module Gyler.CachedFile.Internal (
     CachedFile (..)
     ,newFile
     ,newFileDefault
-    ,getValue
+    ,readCached
     ,getCachedContent
     ,fileAge
     ,isFileFresh
@@ -78,8 +78,8 @@ readContent file  = do
 -- Uses cache if available, otherwise:
 --   - if file is fresh, load from disk
 --   - if file is stale, return Nothing
-getValue :: CachedFile -> IO (Maybe T.Text)
-getValue file = do
+readCached :: CachedFile -> IO (Maybe T.Text)
+readCached file = do
     currentValue <- getCachedContent file
 
     case currentValue of

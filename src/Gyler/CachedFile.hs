@@ -2,7 +2,7 @@ module Gyler.CachedFile (
     CachedFile (..)
     ,newFile
     ,newFileDefault
-    ,getValue
+    ,readCached
     ,writeValue
 ) where
 
@@ -19,16 +19,19 @@ becomes stale based on a specified time threshold (`NominalDiffTime`).
 * 'CachedFile': Configuration type (path, cache ref, freshness threshold)
 * 'newFile': Creates a cache with custom staleness threshold (seconds)
 * 'newFileDefault': Creates cache with default 120s staleness threshold
-* 'getValue': Safely retrieves cached content:
+* 'readCached': Safely retrieves cached content:
   - Uses cached version when available
   - Reads from disk if cache is empty but file is fresh
   - Returns 'Nothing' for unreadable/stale files
+* 'writeValue': Writes value to cache and into file
+* 'fetchOrRun': Attempts to retrieve a cached value.
+                Runs external command if cache is not available.
 
 == Example Usage
 
 @
 cf <- newFileDefault "cached_output.txt"
-content <- getValue cf
+content <- readCached cf
 
 case content of
     Just val -> print "Loaded from cache/fresh disk read"

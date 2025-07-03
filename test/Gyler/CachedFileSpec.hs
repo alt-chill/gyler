@@ -27,12 +27,12 @@ spec = describe "Gyler.CachedFile" $ do
         cached <- getCachedContent file
         cached `shouldBe` Nothing
 
-    it "getValue returns Nothing for non-existing file" $ do
+    it "readCached returns Nothing for non-existing file" $ do
         file <- newFileDefault "somefile"
-        value <- getValue file
+        value <- readCached file
         value `shouldBe` Nothing
 
-    it "getValue returns Nothing for stale file" $ do
+    it "readCached returns Nothing for stale file" $ do
         withSystemTempFile "test.txt" $ \fp h -> do
             hPutStrLn h "Ignored"
             hClose h
@@ -40,30 +40,30 @@ spec = describe "Gyler.CachedFile" $ do
             file <- newFile fp 0.001
             threadDelay 10000
 
-            value <- getValue file
+            value <- readCached file
             value `shouldBe` Nothing
 
-    it "getValue reads and caches content of file" $
+    it "readCached reads and caches content of file" $
         withSystemTempFile "test.txt" $ \fp h -> do
             hPutStr h "hello\n"
             hClose h
 
             file <- newFile fp 1000
 
-            value  <- getValue file
+            value  <- readCached file
             cached <- getCachedContent file
 
             value `shouldBe` Just "hello\n"
             cached `shouldBe` Just "hello\n"
 
-    it "getValue always return cached value after reading" $
+    it "readCached always return cached value after reading" $
         withSystemTempFile "test.txt" $ \fp h -> do
             hPutStr h "hello\n"
             hClose h
 
             file <- newFileDefault fp
 
-            value  <- getValue file
+            value  <- readCached file
             cached <- getCachedContent file
 
             value `shouldBe` Just "hello\n"
@@ -71,7 +71,7 @@ spec = describe "Gyler.CachedFile" $ do
 
             writeFile fp "ignored"
 
-            value2  <- getValue file
+            value2  <- readCached file
             value2 `shouldBe` value
 
     it "isFileFresh returns True for recently modified files" $ do
@@ -100,19 +100,19 @@ spec = describe "Gyler.CachedFile" $ do
             ok <- isFileFresh file
             ok `shouldBe` False
 
-    it "getValue returns Nothing if cache is cleared and file is stale" $ do
+    it "readCached returns Nothing if cache is cleared and file is stale" $ do
         withSystemTempFile "test.txt" $ \fp h -> do
             hPutStr h "cached"
             hClose h
 
             file <- newFile fp 0.001
-            _ <- getValue file
+            _ <- readCached file
             threadDelay 10000
 
             -- manual cleanup
             writeIORef (cache file) Nothing
 
-            value <- getValue file
+            value <- readCached file
             value `shouldBe` Nothing
 
     it "readContent manually updates the cache" $ do
