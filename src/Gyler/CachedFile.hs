@@ -1,5 +1,5 @@
 module Gyler.CachedFile (
-     CachedFile (..)
+     CachedFile
     ,ReadFrom(..)
     ,newFile
     ,newFileDefault
