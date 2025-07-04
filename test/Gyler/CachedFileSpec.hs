@@ -24,39 +24,112 @@ import TestUtils (withTempFilePath)
 
 spec :: Spec
 spec = describe "Gyler.CachedFile" $ do
-    it "newFileDefault initializes with empty cache" $ do
-        file <- newFileDefault "somefile"
-        cached <- getCachedContent file
-        cached `shouldBe` Nothing
-
-    it "readCached returns Nothing for non-existing file" $ do
-        file <- newFileDefault "somefile"
-        value <- readCached file
-        value `shouldBe` Nothing
-
-    it "readCached returns Nothing for stale file" $ do
+    it "fileAge returns small diff immediately after writing" $
         withSystemTempFile "test.txt" $ \fp h -> do
-            hPutStrLn h "Ignored"
+            hPutStr h "diff"
+            hClose h
+
+            file <- newFileDefault fp
+            diff <- fileAge file
+
+            diff `shouldSatisfy` (< 1)
+
+    it "fileAge throws exception for nonexistent file" $ do
+        file <- newFileDefault "nonexistent.txt"
+        result <- try (fileAge file) :: IO (Either IOError NominalDiffTime)
+        result `shouldSatisfy` isLeft
+
+    it "fetchOrRun caches empty output properly" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out <- fetchOrRun file ("true", [])
+            out `shouldBe` (Executable, "")
+            cached <- getCachedContent file
+            cached `shouldBe` Just ""
+
+    it "fetchOrRun returns \"\" if output is not valid UTF-8" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out <- fetchOrRun file ("head", ["-c", "1000", "/dev/urandom"])
+            out `shouldBe` (Error, "")
+
+    it "fetchOrRun returns cached value if present" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            writeValue file "cached!"
+            out <- fetchOrRun file ("echo", ["ignored"])
+            out `shouldBe` (Cache, "cached!")
+
+    it "fetchOrRun returns empty string if command fails" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out <- fetchOrRun file ("false", [])
+            out `shouldBe` (Error, "")
+
+    it "fetchOrRun returns empty string if executable does not exist" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out <- fetchOrRun file ("unknown_command_", [])
+            out `shouldBe` (Error, "")
+
+    it "fetchOrRun runs command and caches output if no cache is present" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out1 <- fetchOrRun file ("echo", ["hello"])
+            out1 `shouldBe` (Executable, "hello\n")
+
+            content <- readFile fp
+            content `shouldBe` "hello\n"
+
+            out2 <- fetchOrRun file ("echo", ["ignored"])
+            out2 `shouldBe` (Cache, "hello\n")
+
+    it "fetchOrRun runs command and return output if file is not available" $ do
+        file <- newFileDefault "/non/existing/dir/file.txt"
+        out1 <- fetchOrRun file ("echo", ["hello"])
+        out1 `shouldBe` (Executable, "hello\n")
+
+    it "fetchOrRun runs command if file is stale" $
+        withSystemTempFile "test.txt" $ \fp h -> do
+            hPutStr h "stale"
             hClose h
 
             file <- newFile fp 0.001
             threadDelay 10000
 
-            value <- readCached file
-            value `shouldBe` Nothing
+            out <- fetchOrRun file ("echo", ["fresh"])
+            out `shouldBe` (Executable, "fresh\n")
 
-    it "readCached reads and caches content of file" $
+    it "isFileFresh returns False for non-existent file" $ do
+        let fakeFile = "nonexistent.txt"
+        file <- newFileDefault fakeFile
+        ok <- isFileFresh file
+        ok `shouldBe` False
+
+    it "isFileFresh returns False for stale file" $
         withSystemTempFile "test.txt" $ \fp h -> do
-            hPutStr h "hello\n"
+            hClose h
+
+            file <- newFile fp 0.001
+            threadDelay 10000
+
+            ok <- isFileFresh file
+            ok `shouldBe` False
+
+    it "isFileFresh returns True for recently modified files" $ do
+        withSystemTempFile "test.txt" $ \fp h -> do
+            hPutStr h "recent"
             hClose h
 
             file <- newFile fp 1000
+            ok <- isFileFresh file
 
-            value  <- readCached file
-            cached <- getCachedContent file
+            ok `shouldBe` True
 
-            value `shouldBe` Just "hello\n"
-            cached `shouldBe` Just "hello\n"
+    it "newFileDefault initializes with empty cache" $ do
+        file <- newFileDefault "somefile"
+        cached <- getCachedContent file
+        cached `shouldBe` Nothing
 
     it "readCached always return cached value after reading" $
         withSystemTempFile "test.txt" $ \fp h -> do
@@ -76,31 +149,42 @@ spec = describe "Gyler.CachedFile" $ do
             value2  <- readCached file
             value2 `shouldBe` value
 
-    it "isFileFresh returns True for recently modified files" $ do
+    it "readCached reads and caches content of file" $
         withSystemTempFile "test.txt" $ \fp h -> do
-            hPutStr h "recent"
+            hPutStr h "hello\n"
             hClose h
 
             file <- newFile fp 1000
-            ok <- isFileFresh file
 
-            ok `shouldBe` True
+            value  <- readCached file
+            cached <- getCachedContent file
 
-    it "isFileFresh returns False for non-existent file" $ do
-        let fakeFile = "nonexistent.txt"
-        file <- newFileDefault fakeFile
-        ok <- isFileFresh file
-        ok `shouldBe` False
+            value `shouldBe` Just "hello\n"
+            cached `shouldBe` Just "hello\n"
 
-    it "isFileFresh returns False for stale file" $
+    it "readCached returns Just \"\" for empty file" $
         withSystemTempFile "test.txt" $ \fp h -> do
+            hClose h
+
+            file <- newFileDefault fp
+            value <- readCached file
+            value `shouldBe` Just ""
+
+    it "readCached returns Nothing for non-existing file" $ do
+        file <- newFileDefault "somefile"
+        value <- readCached file
+        value `shouldBe` Nothing
+
+    it "readCached returns Nothing for stale file" $ do
+        withSystemTempFile "test.txt" $ \fp h -> do
+            hPutStrLn h "Ignored"
             hClose h
 
             file <- newFile fp 0.001
             threadDelay 10000
 
-            ok <- isFileFresh file
-            ok `shouldBe` False
+            value <- readCached file
+            value `shouldBe` Nothing
 
     it "readCached returns Nothing if cache is cleared and file is stale" $ do
         withSystemTempFile "test.txt" $ \fp h -> do
@@ -111,70 +195,10 @@ spec = describe "Gyler.CachedFile" $ do
             _ <- readCached file
             threadDelay 10000
 
-            -- manual cleanup
             writeIORef (cache file) Nothing
 
             value <- readCached file
             value `shouldBe` Nothing
-
-    it "readContent manually updates the cache" $ do
-        withSystemTempFile "test.txt" $ \fp h -> do
-            hPutStr h "first"
-            hClose h
-
-            file <- newFileDefault fp
-            _ <- readContent file
-            cached1 <- getCachedContent file
-            cached1 `shouldBe` Just "first"
-
-            writeFile fp "second"
-            _ <- readContent file
-            cached2 <- getCachedContent file
-            cached2 `shouldBe` Just "second"
-
-    it "fileAge returns small diff immediately after writing" $
-        withSystemTempFile "test.txt" $ \fp h -> do
-            hPutStr h "diff"
-            hClose h
-
-            file <- newFileDefault fp
-            diff <- fileAge file
-
-            diff `shouldSatisfy` (< 1)
-
-    it "readCached returns Just \"\" for empty file" $
-        withSystemTempFile "test.txt" $ \fp h -> do
-            hClose h
-
-            file <- newFileDefault fp
-            value <- readCached file
-            value `shouldBe` Just ""
-
-    it "writeValue updates both cache and file content" $
-        withTempFilePath $ \fp -> do
-            file <- newFileDefault fp
-            writeValue file "written"
-            content <- readFile fp
-            cached <- getCachedContent file
-            content `shouldBe` "written"
-            cached `shouldBe` Just "written"
-
-    it "writeValue catches exception and still updates cache" $ do
-        let path = "/forbidden"
-        file <- newFileDefault path
-        writeValue file "shouldNotFail"
-        cached <- getCachedContent file
-        cached `shouldBe` Just "shouldNotFail"
-
-    it "readContent returns Nothing for missing file" $ do
-        file <- newFileDefault "nonexistent.txt"
-        value <- readContent file
-        value `shouldBe` Nothing
-
-    it "fileAge throws exception for nonexistent file" $ do
-        file <- newFileDefault "nonexistent.txt"
-        result <- try (fileAge file) :: IO (Either IOError NominalDiffTime)
-        result `shouldSatisfy` isLeft
 
     it "readContent does not clear cache if reading fails" $
         withSystemTempFile "test.txt" $ \fp h -> do
@@ -191,67 +215,38 @@ spec = describe "Gyler.CachedFile" $ do
             cached `shouldBe` Just "good"
             failed `shouldBe` Nothing
 
-    it "fetchOrRun returns cached value if present" $
-        withTempFilePath $ \fp -> do
-            file <- newFileDefault fp
-            writeValue file "cached!"
-            out <- fetchOrRun file ("echo", ["ignored"])
-            out `shouldBe` (Cache, "cached!")
-
-    it "fetchOrRun runs command and caches output if no cache is present" $
-        withTempFilePath $ \fp -> do
-            file <- newFileDefault fp
-            out1 <- fetchOrRun file ("echo", ["hello"])
-            out1 `shouldBe` (Executable, "hello\n")
-
-            -- file should now contain the same content
-            content <- readFile fp
-            content `shouldBe` "hello\n"
-
-            -- second call should return cached value (even if echo would output something else)
-            out2 <- fetchOrRun file ("echo", ["ignored"])
-            out2 `shouldBe` (Cache, "hello\n")
-
-    it "fetchOrRun runs command and return output if file is not available" $ do
-        file <- newFileDefault "/non/existing/dir/file.txt"
-        out1 <- fetchOrRun file ("echo", ["hello"])
-        out1 `shouldBe` (Executable, "hello\n")
-
-    it "fetchOrRun returns empty string if command fails" $
-        withTempFilePath $ \fp -> do
-            file <- newFileDefault fp
-            out <- fetchOrRun file ("false", [])
-            out `shouldBe` (Error, "")
-
-    it "fetchOrRun returns empty string if executable does not exist" $
-        withTempFilePath $ \fp -> do
-            file <- newFileDefault fp
-            out <- fetchOrRun file ("unknown_command_", [])
-            out `shouldBe` (Error, "")
-
-    it "fetchOrRun caches empty output properly" $
-        withTempFilePath $ \fp -> do
-            file <- newFileDefault fp
-            out <- fetchOrRun file ("true", [])
-            out `shouldBe` (Executable, "")
-            cached <- getCachedContent file
-            cached `shouldBe` Just ""
-
-    it "fetchOrRun runs command if file is stale" $
+    it "readContent manually updates the cache" $ do
         withSystemTempFile "test.txt" $ \fp h -> do
-            hPutStr h "stale"
+            hPutStr h "first"
             hClose h
 
-            file <- newFile fp 0.001
-            threadDelay 10000  -- make file stale
+            file <- newFileDefault fp
+            _ <- readContent file
+            cached1 <- getCachedContent file
+            cached1 `shouldBe` Just "first"
 
-            out <- fetchOrRun file ("echo", ["fresh"])
-            out `shouldBe` (Executable, "fresh\n")
+            writeFile fp "second"
+            _ <- readContent file
+            cached2 <- getCachedContent file
+            cached2 `shouldBe` Just "second"
 
-    it "fetchOrRun returns \"\" if output is not valid UTF-8" $
+    it "readContent returns Nothing for missing file" $ do
+        file <- newFileDefault "nonexistent.txt"
+        value <- readContent file
+        value `shouldBe` Nothing
+
+    it "writeValue catches exception and still updates cache" $ do
+        let path = "/forbidden"
+        file <- newFileDefault path
+        writeValue file "shouldNotFail"
+        cached <- getCachedContent file
+        cached `shouldBe` Just "shouldNotFail"
+
+    it "writeValue updates both cache and file content" $
         withTempFilePath $ \fp -> do
             file <- newFileDefault fp
-
-            -- head -c 1000 /dev/urandom gives random bytes (may be invalid UTF-8)
-            out <- fetchOrRun file ("head", ["-c", "1000", "/dev/urandom"])
-            out `shouldBe` (Error, "")
+            writeValue file "written"
+            content <- readFile fp
+            cached <- getCachedContent file
+            content `shouldBe` "written"
+            cached `shouldBe` Just "written"
