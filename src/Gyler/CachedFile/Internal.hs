@@ -31,30 +31,40 @@ import qualified Data.ByteString.Lazy as BL (ByteString, toStrict)
 
 import Gyler.Types
 
+-- | Represents a cached file with:
+--   - filePath: the path to the file on disk
+--   - cache: an in-memory reference to the current content (if any)
+--   - maxStaleAge: duration after which the file is considered stale
 data CachedFile = CachedFile {
     filePath :: !FilePath,
-    cache :: !(IORef (Maybe T.Text)),
-    maxStaleAge :: !NominalDiffTime -- in seconds
+    cache :: !(IORef (Maybe T.Text)), -- In-memory snapshot to reduce I/O
+    maxStaleAge :: !NominalDiffTime   -- in seconds
 }
 
-data ReadFrom = Cache | Executable | Error deriving (Show, Eq)
+-- | Describes the origin of the data returned by 'fetchOrRun'.
+--   - Cache: from in-memory or file cache
+--   - Executable: from running an external command
+--   - Error: command failed or output was invalid
+data ReadFrom = Cache | Executable | Error
+    deriving (Show, Eq)
 
-newFile :: FilePath-> NominalDiffTime -> IO CachedFile
-newFile file time = do
+-- | Creates a new cached file with a custom staleness threshold.
+newFile :: FilePath -> NominalDiffTime -> IO CachedFile
+newFile path ttl = do
     ref <- newIORef Nothing
-    return CachedFile {
-        filePath = file,
-        cache = ref,
-        maxStaleAge = time
-    }
+    return CachedFile { filePath = path, cache = ref, maxStaleAge = ttl }
 
+-- | Creates a new cached file with a default staleness threshold (120 seconds).
 newFileDefault :: FilePath -> IO CachedFile
 newFileDefault file = newFile file defaultTime
     where defaultTime = 120
 
+-- | Returns the current value stored in the in-memory cache
 getCachedContent :: CachedFile -> IO (Maybe T.Text)
 getCachedContent file = readIORef (cache file)
 
+-- | Computes the age of the underlying file relative to the current time.
+-- Returns the number of seconds since the file was last modified.
 fileAge :: CachedFile -> IO NominalDiffTime
 fileAge file = do
     currentTime <- getCurrentTime
@@ -72,9 +82,9 @@ isFileFresh file = do
         Right currentDiff -> return (currentDiff < maxStaleAge file)
         Left _ -> return False
 
--- Reads file content from disk and caches it.
--- Returns an Nothing if reading fails (e.g., file not found).
--- Do not clean the cache if reading fails
+-- | Attempts to read the file from disk and update the in-memory cache.
+-- If reading fails (e.g. due to missing or unreadable file), returns Nothing
+-- and leaves the cache unchanged.
 readContent :: CachedFile -> IO (Maybe T.Text)
 readContent file  = do
     let handler :: IOException -> IO (Maybe T.Text)
@@ -88,10 +98,11 @@ readContent file  = do
 
     return content
 
--- Main access point for cached value.
--- Uses cache if available, otherwise:
---   - if file is fresh, load from disk
---   - if file is stale, return Nothing
+
+-- | Retrieves the cached value.
+-- If no value is cached:
+--   - Tries to read from disk if the file is still fresh.
+--   - Returns Nothing if the file is stale or unreadable.
 readCached :: CachedFile -> IO (Maybe T.Text)
 readCached file = do
     currentValue <- getCachedContent file
@@ -103,8 +114,8 @@ readCached file = do
                            else return Nothing      -- nothing in cache
         v@(Just val) -> return v                    -- cached value
 
--- Writes value to cache and into file
--- Doing nothing if write is failed
+-- | Writes the given value both to the file on disk and to the in-memory cache.
+-- If the file write fails, the cache is still updated in memory.
 writeValue :: CachedFile -> T.Text -> IO ()
 writeValue file value = do
     let handler :: IOException -> IO ()
@@ -113,10 +124,15 @@ writeValue file value = do
     writeIORef (cache file) (Just value)
     T.writeFile (filePath file) value `catch` handler
 
--- | Attempts to retrieve a cached value.
--- If not available or stale, runs the external command and captures its stdout.
--- The result is saved in the file and returned.
--- If the command fails or decoding fails, returns an empty string.
+-- | Retrieves a value from cache or runs an external command to produce it.
+--
+-- Behavior:
+--   - If a valid cached value exists, it is returned immediately.
+--   - If not, the external command is executed.
+--     - On success: the output is saved to file and cache, and returned.
+--     - On failure (e.g. command fails or output can't be decoded): returns an empty string.
+--
+-- The first value in pair indicates the source of the data: Cache, Executable, or Error.
 fetchOrRun :: CachedFile -> Cmd -> IO (ReadFrom, T.Text)
 fetchOrRun file (exec, args) = do
     cached <- readCached file
