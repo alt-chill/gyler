@@ -1,5 +1,6 @@
 module Gyler.CachedFile (
-    CachedFile (..)
+     CachedFile (..)
+    ,ReadFrom(..)
     ,newFile
     ,newFileDefault
     ,readCached
@@ -27,6 +28,7 @@ becomes stale based on a specified time threshold (`NominalDiffTime`).
 * 'writeValue': Writes value to cache and into file
 * 'fetchOrRun': Attempts to retrieve a cached value.
                 Runs external command if cache is not available.
+* 'ReadFrom': Meta information that indicates the data source in 'fetchOrRun'
 
 == Example Usage
 

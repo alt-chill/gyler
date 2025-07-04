@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Gyler.CachedFile.Internal (
-    CachedFile (..)
+     CachedFile (..)
+    ,ReadFrom (..)
     ,newFile
     ,newFileDefault
     ,readCached
@@ -35,6 +36,8 @@ data CachedFile = CachedFile {
     cache :: !(IORef (Maybe T.Text)),
     maxStaleAge :: !NominalDiffTime -- in seconds
 }
+
+data ReadFrom = Cache | Executable | Error deriving (Show, Eq)
 
 newFile :: FilePath-> NominalDiffTime -> IO CachedFile
 newFile file time = do
@@ -114,18 +117,18 @@ writeValue file value = do
 -- If not available or stale, runs the external command and captures its stdout.
 -- The result is saved in the file and returned.
 -- If the command fails or decoding fails, returns an empty string.
-fetchOrRun :: CachedFile -> Cmd -> IO T.Text
+fetchOrRun :: CachedFile -> Cmd -> IO (ReadFrom, T.Text)
 fetchOrRun file (exec, args) = do
     cached <- readCached file
     case cached of
-        Just val -> return val
+        Just val -> return (Cache, val)
         Nothing -> do
             result <- tryRunProcess
             case result of
                 Just output -> do
                     writeValue file output
-                    return output
-                Nothing -> return ""
+                    return (Executable, output)
+                Nothing -> return (Error, "")
   where
     tryRunProcess :: IO (Maybe T.Text)
     tryRunProcess = do

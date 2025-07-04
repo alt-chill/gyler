@@ -196,13 +196,13 @@ spec = describe "Gyler.CachedFile" $ do
             file <- newFileDefault fp
             writeValue file "cached!"
             out <- fetchOrRun file ("echo", ["ignored"])
-            out `shouldBe` "cached!"
+            out `shouldBe` (Cache, "cached!")
 
     it "fetchOrRun runs command and caches output if no cache is present" $
         withTempFilePath $ \fp -> do
             file <- newFileDefault fp
             out1 <- fetchOrRun file ("echo", ["hello"])
-            out1 `shouldBe` "hello\n"
+            out1 `shouldBe` (Executable, "hello\n")
 
             -- file should now contain the same content
             content <- readFile fp
@@ -210,24 +210,24 @@ spec = describe "Gyler.CachedFile" $ do
 
             -- second call should return cached value (even if echo would output something else)
             out2 <- fetchOrRun file ("echo", ["ignored"])
-            out2 `shouldBe` "hello\n"
+            out2 `shouldBe` (Cache, "hello\n")
 
     it "fetchOrRun runs command and return output if file is not available" $ do
         file <- newFileDefault "/non/existing/dir/file.txt"
         out1 <- fetchOrRun file ("echo", ["hello"])
-        out1 `shouldBe` "hello\n"
+        out1 `shouldBe` (Executable, "hello\n")
 
     it "fetchOrRun returns empty string if command fails" $
         withTempFilePath $ \fp -> do
             file <- newFileDefault fp
             out <- fetchOrRun file ("false", [])
-            out `shouldBe` ""
+            out `shouldBe` (Error, "")
 
     it "fetchOrRun caches empty output properly" $
         withTempFilePath $ \fp -> do
             file <- newFileDefault fp
             out <- fetchOrRun file ("true", [])
-            out `shouldBe` ""
+            out `shouldBe` (Executable, "")
             cached <- getCachedContent file
             cached `shouldBe` Just ""
 
@@ -240,7 +240,7 @@ spec = describe "Gyler.CachedFile" $ do
             threadDelay 10000  -- make file stale
 
             out <- fetchOrRun file ("echo", ["fresh"])
-            out `shouldBe` "fresh\n"
+            out `shouldBe` (Executable, "fresh\n")
 
     it "fetchOrRun returns \"\" if output is not valid UTF-8" $
         withTempFilePath $ \fp -> do
@@ -248,4 +248,4 @@ spec = describe "Gyler.CachedFile" $ do
 
             -- head -c 1000 /dev/urandom gives random bytes (may be invalid UTF-8)
             out <- fetchOrRun file ("head", ["-c", "1000", "/dev/urandom"])
-            out `shouldBe` ""
+            out `shouldBe` (Error, "")
