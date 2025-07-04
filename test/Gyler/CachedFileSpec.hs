@@ -223,6 +223,12 @@ spec = describe "Gyler.CachedFile" $ do
             out <- fetchOrRun file ("false", [])
             out `shouldBe` (Error, "")
 
+    it "fetchOrRun returns empty string if executable does not exist" $
+        withTempFilePath $ \fp -> do
+            file <- newFileDefault fp
+            out <- fetchOrRun file ("unknown_command_", [])
+            out `shouldBe` (Error, "")
+
     it "fetchOrRun caches empty output properly" $
         withTempFilePath $ \fp -> do
             file <- newFileDefault fp
