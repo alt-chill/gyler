@@ -20,6 +20,8 @@ library
   exposed-modules:     Gyler.CachedFile
                       ,Gyler.CachedFile.Internal
 
+                      ,Gyler.GirarEntity
+
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv
 
