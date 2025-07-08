@@ -42,6 +42,7 @@ test-suite gyler-tests
   main-is:             Main.hs
 
   other-modules:       Gyler.CachedFileSpec
+                       TestUtils
 
   build-depends:      ,base >=4.7 && <5
                       ,gyler
@@ -52,6 +53,8 @@ test-suite gyler-tests
                       ,process
                       ,temporary
                       ,time
+                      ,filepath
+                      ,random
 
   default-language:    Haskell2010
 
