@@ -20,6 +20,14 @@ library
   exposed-modules:     Gyler.CachedFile
                       ,Gyler.CachedFile.Internal
 
+                      ,Gyler.GirarEnv
+
+                      ,Gyler.Context.Ssh
+                      ,Gyler.Context.Curl
+                      ,Gyler.Context.Commands
+                      ,Gyler.Context.Gyler
+                      ,Gyler.Context
+
                       ,Gyler.Types
 
   hs-source-dirs:      src
@@ -30,6 +38,7 @@ library
                       ,text
                       ,directory
                       ,time
+                      ,lens
                       ,filepath
                       ,typed-process
 
