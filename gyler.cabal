@@ -20,6 +20,7 @@ library
   exposed-modules:     Gyler.CachedFile
                       ,Gyler.CachedFile.Internal
 
+                      ,Gyler.GylerM
                       ,Gyler.GirarEnv
 
                       ,Gyler.Context.Ssh
@@ -38,6 +39,7 @@ library
                       ,text
                       ,directory
                       ,time
+                      ,mtl
                       ,lens
                       ,filepath
                       ,typed-process
