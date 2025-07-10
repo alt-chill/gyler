@@ -21,6 +21,7 @@ library
                       ,Gyler.CachedFile.Internal
 
                       ,Gyler.GirarEntity
+                      ,Gyler.GirarEntity.Branches
 
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv
@@ -58,6 +59,8 @@ test-suite gyler-tests
 
   other-modules:       Gyler.CachedFileSpec
                        Gyler.GirarCommandSpec
+
+                       Gyler.GirarEntity.BranchesSpec
                        TestUtils
 
   build-depends:      ,base >=4.7 && <5
