@@ -22,6 +22,7 @@ library
 
                       ,Gyler.GirarEntity
                       ,Gyler.GirarEntity.Branches
+                      ,Gyler.Utils.List
 
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv
