@@ -22,6 +22,8 @@ library
 
                       ,Gyler.GirarEntity
                       ,Gyler.GirarEntity.Branches
+                      ,Gyler.GirarEntity.Maintainers
+
                       ,Gyler.Utils.List
 
                       ,Gyler.GylerM
@@ -62,6 +64,8 @@ test-suite gyler-tests
                        Gyler.GirarCommandSpec
 
                        Gyler.GirarEntity.BranchesSpec
+                       Gyler.GirarEntity.MaintainersSpec
+
                        TestUtils
 
   build-depends:      ,base >=4.7 && <5
