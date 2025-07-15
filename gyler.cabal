@@ -39,6 +39,8 @@ library
 
                       ,Gyler.Types
 
+                      ,Gyler.Data.NonEmptyText
+
   hs-source-dirs:      src
 
   build-depends:      ,base >=4.7 && <5
@@ -51,6 +53,7 @@ library
                       ,lens
                       ,filepath
                       ,typed-process
+                      ,deepseq
 
   default-language:    Haskell2010
 
@@ -66,11 +69,14 @@ test-suite gyler-tests
                        Gyler.GirarEntity.BranchesSpec
                        Gyler.GirarEntity.MaintainersSpec
 
+                       Gyler.Data.NonEmptyTextSpec
+
                        TestUtils
 
   build-depends:      ,base >=4.7 && <5
                       ,gyler
                       ,hspec
+                      ,QuickCheck
                       ,bytestring
                       ,text
                       ,directory
