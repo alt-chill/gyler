@@ -40,6 +40,7 @@ library
                       ,Gyler.Types
 
                       ,Gyler.Data.NonEmptyText
+                      ,Gyler.Data.NonEmptyText.Unsafe
 
   hs-source-dirs:      src
 
