@@ -28,12 +28,24 @@ module Gyler.Data.NonEmptyText
     -- * Folds
     , Gyler.Data.NonEmptyText.foldl1
     , Gyler.Data.NonEmptyText.foldl1'
+
+    -- * Breaking into lines and words
+    , Gyler.Data.NonEmptyText.lines
+    , Gyler.Data.NonEmptyText.words
+    , Gyler.Data.NonEmptyText.unlines
+    , Gyler.Data.NonEmptyText.unwords
+
+    -- * Converting to String
+    , Gyler.Data.NonEmptyText.pack
+    , Gyler.Data.NonEmptyText.unpack
     ) where
 
 import Control.DeepSeq (NFData)
 import Data.Bifunctor ( bimap )
 import qualified Data.Text as Text
 import GHC.Generics (Generic)
+
+import Data.Maybe (mapMaybe)
 
 data NonEmptyText =
   NonEmptyText Char Text.Text
@@ -173,3 +185,43 @@ foldl1 fn (NonEmptyText h t) = Text.foldl fn h t
 foldl1' :: (Char -> Char -> Char) -> NonEmptyText -> Char
 foldl1' fn (NonEmptyText h t) = Text.foldl' fn h t
 {-# INLINE Gyler.Data.NonEmptyText.foldl1' #-}
+
+
+-- | /O(n)/ Break a 'NonEmptyText' into lines.
+-- Empty lines are not discarded.
+lines :: NonEmptyText -> [NonEmptyText]
+lines = mapMaybe fromText . Text.lines . toText
+{-# INLINE Gyler.Data.NonEmptyText.lines #-}
+
+-- | /O(n)/ Break a 'NonEmptyText' into words, separated by whitespace.
+words :: NonEmptyText -> [NonEmptyText]
+words = mapMaybe fromText . Text.words . toText
+{-# INLINE Gyler.Data.NonEmptyText.words #-}
+
+-- | /O(n)/ The inverse of 'lines'.  Joins a list of 'NonEmptyText' with
+--   newline characters.  Because the result may be empty when the input list
+--   is empty, the function returns @Maybe NonEmptyText@.
+unlines :: [NonEmptyText] -> Maybe NonEmptyText
+unlines = fromText . Text.unlines . fmap toText
+{-# INLINE Gyler.Data.NonEmptyText.unlines #-}
+
+-- | /O(n)/ The inverse of 'words'.  Joins a list of 'NonEmptyText' with
+--   single space characters.  Returns 'Nothing' when the input list is empty.
+--
+unwords :: [NonEmptyText] -> Maybe NonEmptyText
+unwords = fromText . Text.unwords . fmap toText
+{-# INLINE Gyler.Data.NonEmptyText.unwords #-}
+
+-- | /O(n)/ Convert a String into a NonEmptyText.
+-- Performs replacement on invalid scalar values, so unpack . pack is not id:
+--
+-- Because the result may be empty when the input string
+-- is empty, the function returns @Maybe NonEmptyText@.
+pack :: String -> Maybe NonEmptyText
+pack = fromText . Text.pack
+{-# INLINE Gyler.Data.NonEmptyText.pack #-}
+
+-- /O(n)/ Convert a NonEmptyText into a String.
+unpack :: NonEmptyText -> String
+unpack = Text.unpack . toText
+{-# INLINE Gyler.Data.NonEmptyText.unpack #-}
