@@ -38,7 +38,7 @@ module Gyler.GirarEntity (GirarEntity (..), getData) where
 --
 -- See also: 'Gyler.GirarEnv', 'Gyler.Context', 'Gyler.CachedFile'
 
-import Data.Text (Text)
+import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
 
 import Gyler.GylerM (GylerM)
 import Gyler.GirarCommand (GirarCommand, toCmd)
@@ -78,7 +78,7 @@ class GirarEntity e where
     -- | Parses the raw output of the Girar command into structured values.
     --
     -- Returns a list of parsed entries, or an empty list on failure.
-    parseValue        :: e -> Maybe GirarEnv -> Text -> [Text]
+    parseValue        :: e -> Maybe GirarEnv -> NonEmptyText -> [NonEmptyText]
 
 
 {- Not type-class functions -}
@@ -115,7 +115,7 @@ getCachedFile ent = do
 -- current 'Gyler.Context', depending on the entity.
 --
 -- Returns an empty list if command execution or parsing fails.
-getData :: GirarEntity e => e -> GylerM [Text]
+getData :: GirarEntity e => e -> GylerM [NonEmptyText]
 getData ent = do
     env <- view girarEnv
     cfg <- view commandsConfig
@@ -123,6 +123,8 @@ getData ent = do
     let exec = toCmd cfg $ getGirarCommand ent
 
     cache      <- getCachedFile ent
-    (_, raw)   <- liftIO $ CF.fetchOrRun cache exec
+    (_, output)   <- liftIO $ CF.fetchOrRun cache exec
 
-    return $ parseValue ent env raw
+    case fromText output of
+        Just raw -> return $ parseValue ent env raw
+        Nothing  -> return []

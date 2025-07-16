@@ -19,7 +19,7 @@ module Gyler.GirarEntity.Branches (
 import Gyler.GirarEntity (GirarEntity (..))
 import Gyler.GirarCommand (GirarCommand (ViaGyle))
 
-import qualified Data.Text as T (lines)
+import qualified Gyler.Data.NonEmptyText as NET (lines)
 
 data Branches = Branches deriving (Eq, Show)
 
@@ -37,4 +37,4 @@ instance GirarEntity Branches where
     --   p9
     --   sisyphus
     -- So we just split output with '\n' as delimiter
-    parseValue _ _ = T.lines
+    parseValue _ _ = NET.lines

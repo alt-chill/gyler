@@ -3,69 +3,64 @@
 module Gyler.GirarCommand (
     GirarCommand (..),
     toCmd
-    ) where
-
--- | Represents abstraction for executing commands through girar using
--- different ways (Gyle, Gitery, or Curl).
---
--- Used by GirarEntities to return.
+) where
 
 import Control.Lens ((^.))
-import Data.Text (Text)
+import Data.Maybe       (fromMaybe, maybe)
+import Data.Semigroup   ((<>))
 
-import Gyler.GylerM (GylerM)
-import Gyler.Context (
-    CommandsConfig,
-    giteryConfig, gyleConfig, curlConfig,
-    sshExecutable, sshArgs, remoteUser,
-    remoteHost, remotePort, SshConfig (SshConfig),
-    curlExecutable, curlArgs
- )
-import Data.Maybe (fromMaybe, maybe)
+import Gyler.Data.NonEmptyText
+       ( NonEmptyText
+       , singleton
+       )
+
+import Gyler.Context
+       ( CommandsConfig
+       , SshConfig (SshConfig)
+       , giteryConfig, gyleConfig, curlConfig
+       , sshExecutable, sshArgs, remoteUser
+       , remoteHost, remotePort
+       , curlExecutable, curlArgs
+       )
 
 import Gyler.Types (Cmd)
 
+-- | Abstraction over the three ways we can interact with girar
 data GirarCommand
-    = ViaGyle   { gyleArgs    :: ![Text] }
-    | ViaGitery { gitertyArgs :: ![Text]}
-    | ViaCurl   { endpoint    :: !Text }
+    = ViaGyle   { gyleArgs    :: ![NonEmptyText] }
+    | ViaGitery { gitertyArgs :: ![NonEmptyText] }
+    | ViaCurl   { endpoint    :: !NonEmptyText }
 
--- | Convert SSH configuration into executable command format
---
--- Constructs a command tuple (executable, arguments) from:
--- * SSH executable path
--- * Additional SSH arguments
--- * Remote connection credentials (user@host)
--- * Port (defaults to 22 if not specified)
--- * Optional identity file
+-- | Build the user@host segment
+at :: NonEmptyText -> NonEmptyText -> NonEmptyText
+at usr host = usr <> singleton '@' <> host
+
+-- | Convert an 'SshConfig' into an executable/name pair.
+--   The resulting list of arguments is also non‑empty.
 fromSsh :: SshConfig -> Cmd
 fromSsh (SshConfig exec extra user host port key) =
-  ( exec
-  , extra ++
-    [ user <> "@" <> host
-    , "-p"
-    , fromMaybe "22" port
-    ] ++
-    maybe [] (\i -> ["-i", i]) key
-  )
+    ( exec
+    ,    extra
+      ++ [ user `at` host
+         , "-p"
+         , fromMaybe "22" port
+         ]
+      ++ maybe [] (\i -> ["-i", i]) key
+    )
 
--- | Convert a GirarCommand to an cmd using configuration from context.
+-- | Translate a 'GirarCommand' into the concrete command ready for @process@.
+--   Uses the executable/argument defaults from the provided 'CommandsConfig'.
 --
--- Parameters:
---   * 'cfg' - Configuration from Gyler.Context
+-- >>> toCmd cfg (ViaCurl "https://git.altlinux.org")
+-- ("curl", ["https://git.altlinux.org"])
 --
--- Examples:
--- >>> toCmd config (ViaGitery ["ls", "/"])
--- ("ssh", ["-p","22","user@host","ls","/"])
---
--- >>> toCmd config (ViaCurl "https://api.example.com")
--- ("curl", ["https://api.example.com"])
+-- NOTE: This function never returns an empty executable or argument segment.
 toCmd :: CommandsConfig -> GirarCommand -> Cmd
 toCmd cfg (ViaGitery args) = fmap (++ args) (fromSsh (cfg ^. giteryConfig))
-toCmd cfg (ViaGyle args)   = fmap (++ args) (fromSsh (cfg ^. gyleConfig))
+toCmd cfg (ViaGyle   args) = fmap (++ args) (fromSsh (cfg ^. gyleConfig))
 
 toCmd cfg (ViaCurl target) =
-  let useCfg = cfg ^. curlConfig
-  in ( useCfg ^. curlExecutable
-     , (useCfg ^. curlArgs) ++ [target]
+  let cCfg = cfg ^. curlConfig
+  in ( cCfg ^. curlExecutable
+     , (cCfg ^. curlArgs) ++ [target]
      )

@@ -13,15 +13,15 @@ module Gyler.Context.Ssh (
 ) where
 
 import Control.Lens (makeLenses)
-import Data.Text (Text)
+import Gyler.Data.NonEmptyText.Unsafe (NonEmptyText)
 
 data SshConfig = SshConfig
-    { _sshExecutable :: !Text
-    , _sshArgs       :: ![Text]
-    , _remoteUser    :: !Text
-    , _remoteHost    :: !Text
-    , _remotePort    :: !(Maybe Text)
-    , _authKey       :: !(Maybe Text)
+    { _sshExecutable :: !NonEmptyText
+    , _sshArgs       :: ![NonEmptyText]
+    , _remoteUser    :: !NonEmptyText
+    , _remoteHost    :: !NonEmptyText
+    , _remotePort    :: !(Maybe NonEmptyText)
+    , _authKey       :: !(Maybe NonEmptyText)
     } deriving (Show, Eq)
 
 makeLenses ''SshConfig

@@ -11,11 +11,11 @@ module Gyler.Context.Curl (
 ) where
 
 import Control.Lens (makeLenses)
-import Data.Text (Text)
+import Gyler.Data.NonEmptyText.Unsafe (NonEmptyText)
 
 data CurlConfig = CurlCommandConfig
-    { _curlExecutable :: !Text
-    , _curlArgs       :: ![Text]
+    { _curlExecutable :: !NonEmptyText
+    , _curlArgs       :: ![NonEmptyText]
     } deriving (Show, Eq)
 
 makeLenses ''CurlConfig

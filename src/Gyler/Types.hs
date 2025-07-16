@@ -2,8 +2,8 @@ module Gyler.Types (
     Exec, Args, Cmd
 ) where
 
-import Data.Text (Text)
+import Gyler.Data.NonEmptyText (NonEmptyText)
 
-type Exec = Text
-type Args = [Text]
+type Exec = NonEmptyText
+type Args = [NonEmptyText]
 type Cmd  = (Exec, Args)

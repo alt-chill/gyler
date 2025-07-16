@@ -22,6 +22,8 @@ import Control.Concurrent (threadDelay)
 
 import TestUtils (withTempFilePath)
 
+import Gyler.Data.NonEmptyText.Unsafe (NonEmptyText)
+
 spec :: Spec
 spec = describe "Gyler.CachedFile" $ do
     describe "fileAge" $ do

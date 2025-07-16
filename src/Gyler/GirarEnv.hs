@@ -1,5 +1,4 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 -- | Represents an environment dynamically loaded from a running Gyle/Girar server.
 -- Optionally required for the 'parseValue' function of the 'GirarEntity' typeclass.
@@ -12,7 +11,7 @@ module Gyler.GirarEnv (
     states
 ) where
 
-import Data.Text (Text)
+import Gyler.Data.NonEmptyText (NonEmptyText)
 import Control.Lens (makeLenses)
 
 -- | All values are retrieved via the 'getData' function from a 'GirarEntity'.
@@ -21,9 +20,9 @@ import Control.Lens (makeLenses)
 --     - _states      = getData Gyler.GirarEntity.States
 --     - _maintainers = getData Gyler.GirarEntity.Maintainers
 data GirarEnv = GirarEnv
-  { _branches    :: ![Text]
-  , _states      :: ![Text]
-  , _maintainers :: ![Text]
+  { _branches    :: ![NonEmptyText]
+  , _states      :: ![NonEmptyText]
+  , _maintainers :: ![NonEmptyText]
   } deriving (Show, Eq)
 
 makeLenses ''GirarEnv

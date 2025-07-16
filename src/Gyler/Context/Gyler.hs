@@ -13,7 +13,7 @@ module Gyler.Context.Gyler (
 ) where
 
 import Control.Lens (makeLenses)
-import Data.Text (Text)
+import Gyler.Data.NonEmptyText.Unsafe (NonEmptyText)
 
 import Gyler.Context.Commands
 import Gyler.GirarEnv (GirarEnv)
@@ -22,7 +22,7 @@ data GylerContext = GylerContext
     { _commandsConfig :: !CommandsConfig
     , _girarEnv       :: !(Maybe GirarEnv)
     , _cacheDir       :: !FilePath
-    , _altUser        :: !Text
+    , _altUser        :: !NonEmptyText
     } deriving (Show, Eq)
 
 makeLenses ''GylerContext

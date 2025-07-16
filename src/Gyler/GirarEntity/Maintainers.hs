@@ -20,7 +20,7 @@ module Gyler.GirarEntity.Maintainers (
 import Gyler.GirarEntity (GirarEntity (..))
 import Gyler.GirarCommand (GirarCommand (ViaGitery))
 
-import qualified Data.Text as T (lines, words)
+import qualified Gyler.Data.NonEmptyText as NET (lines, words)
 
 import Data.Maybe (fromMaybe)
 
@@ -49,4 +49,4 @@ instance GirarEntity Maintainers where
     -- splits it into words and takes the last word — assumed to be a maintainer username.
     --
     -- Result is : ["aas", "ab", "abr" ... ]
-    parseValue _ _ = map (fromMaybe "" . safeLast . T.words) .  drop 1 . T.lines
+    parseValue _ _ = map (fromMaybe "" . safeLast . NET.words) .  drop 1 . NET.lines

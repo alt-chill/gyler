@@ -4,7 +4,6 @@ module Gyler.GylerM (
 ) where
 
 import Control.Monad.Reader (ReaderT, runReaderT)
-import Data.Text (Text)
 
 import Gyler.Context.Gyler (GylerContext)
 

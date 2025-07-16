@@ -29,6 +29,8 @@ import qualified Data.Text.Encoding as T (decodeUtf8')
 import qualified Data.ByteString as BS (ByteString)
 import qualified Data.ByteString.Lazy as BL (ByteString, toStrict)
 
+import qualified Gyler.Data.NonEmptyText as NET (unpack)
+
 import Gyler.Types
 
 -- | Represents a cached file with:
@@ -148,7 +150,7 @@ fetchOrRun file (exec, args) = do
   where
     tryRunProcess :: IO (Maybe T.Text)
     tryRunProcess = do
-        let process = proc (T.unpack exec) (map T.unpack args)
+        let process = proc (NET.unpack exec) (map NET.unpack args)
         result <- try (readProcessStdout_  process) :: IO (Either SomeException BL.ByteString)
         return $ case result of
             Left _ -> Nothing
