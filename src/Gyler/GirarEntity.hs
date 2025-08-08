@@ -1,4 +1,4 @@
-module Gyler.GirarEntity (GirarEntity (..), getData) where
+module Gyler.GirarEntity (GirarEntity (..), completeWith) where
 
 -- |
 -- Module      : Gyler.GirarEntity
@@ -6,35 +6,24 @@ module Gyler.GirarEntity (GirarEntity (..), getData) where
 --
 -- This module defines the 'GirarEntity' typeclass, which abstracts over
 -- different Girar entities such as tasks, repositories, maintainers,
--- and ACL groups.
---
--- Entities that implement this typeclass provide:
---
--- 1. A command used to retrieve the data ('getGirarCommand')
--- 2. A unique filename for caching the output ('getCachedFilename')
--- 3. A staleness period in seconds for cache invalidation ('getStaleAge')
--- 4. A parser that processes the command output, optionally using 'GirarEnv' ('parseValue')
+-- and ACL groups. The 'GirarEntity' typeclass is intended to be used for
+-- Gyler autocompletions.
 --
 -- === Caching
 --
--- Data is cached on disk and optionally in memory via 'Gyler.CachedFile'.
+-- Data is cached on disk via 'Gyler.CachedFile'.
+--
 -- The 'getCachedFilename' and 'getStaleAge' methods define how long an entity's
 -- output remains valid before it needs to be refreshed.
 --
+-- If the cache is stale, the Girar command for the entity is executed to update it.
+--
+-- Cached files are stored in the cacheDir retrieved from 'Gyler.Context'.
+--
 -- === Parsing
 --
--- The 'parseValue' function receives the raw command output and an optional 'GirarEnv',
--- which may contain context such as known branches, states, or maintainers. This
--- allows parsing to be context-sensitive when needed.
---
--- === Using
---
--- To load an entity:
---
--- > instance GirarEntity MyEntity where ...
---
--- You can then retrieve its cached or freshly generated data using utilities
--- from the 'Gyler.CachedFile' module in conjunction with this typeclass.
+-- The 'parseValue' function parses the raw command output into the list of 'NonEmptyText'
+-- values. Optionally a 'GirarEnv' is used for context-sensitive parsing.
 --
 -- See also: 'Gyler.GirarEnv', 'Gyler.Context', 'Gyler.CachedFile'
 
@@ -52,13 +41,6 @@ import Control.Lens (view, (^.))
 
 import System.FilePath ((</>))
 
--- | Typeclass for Girar entity descriptors.
---
--- A 'GirarEntity' defines how a specific kind of entity (e.g., branches,
--- maintainers) is queried, cached, and parsed.
---
--- This abstraction allows declarative specification of fetchable entities
--- with minimal boilerplate.
 class GirarEntity e where
     -- | Specifies the Girar command used to fetch the entity's data.
     --
@@ -66,6 +48,7 @@ class GirarEntity e where
     getGirarCommand  :: e -> GirarCommand
 
     -- | Returns the filename (relative to cache directory from GylerContext)
+    --
     -- used to cache the entity's output.
     getCachedFilename :: e -> FilePath
 
@@ -75,23 +58,15 @@ class GirarEntity e where
     -- will be re-executed on the next request.
     getStaleAge       :: e -> Integer -- in seconds
 
-    -- | Parses the raw output of the Girar command into structured values.
+    -- | Parses the raw output of the Girar command.
     --
-    -- Returns a list of parsed entries, or an empty list on failure.
+    -- Returns a list of parsed entries or an empty list on failure.
     parseValue        :: e -> Maybe GirarEnv -> NonEmptyText -> [NonEmptyText]
 
 
-{- Not type-class functions -}
-
 -- | Constructs a 'CachedFile' for a given Girar entity.
 --
--- This sets up caching logic using the filename and staleness period
--- defined by the entity’s 'GirarEntity' instance.
---
--- The cache file is created under the global cache directory, which is
--- provided by the current 'Gyler.Context'.
---
--- This is a low-level helper, used by 'getData'.
+-- This helper used by 'getData'.
 getCachedFile :: GirarEntity e => e -> GylerM CF.CachedFile
 getCachedFile ent = do
     let filename = getCachedFilename ent
@@ -99,24 +74,18 @@ getCachedFile ent = do
     dir <- view cacheDir
     liftIO $ CF.newFile (dir </> filename) age
 
--- | Fetches and parses data for a given Girar entity.
+-- | Fetches and parses data for a given Girar entity
 --
--- This function checks the cached file associated with the entity.
--- If the data is fresh (i.e., not older than 'getStaleAge'), it is
--- loaded from the cache. Otherwise, the 'getGirarCommand' is executed
--- to regenerate the data, and the result is cached.
---
--- Once the raw output is obtained (either from cache or command),
--- 'parseValue' is called to transform it into a list of structured
--- values.
+-- The results are used for Gyler CLI autocompletion.
 --
 -- ==== Note
--- The parsing step may optionally rely on a 'GirarEnv' from the
+-- The parsing step may optionally use a 'GirarEnv' from the
 -- current 'Gyler.Context', depending on the entity.
 --
--- Returns an empty list if command execution or parsing fails.
-getData :: GirarEntity e => e -> GylerM [NonEmptyText]
-getData ent = do
+-- Returns an empty list if command execution or parsing fails,
+-- to avoid runtime checks and errors at higher abstraction levels.
+completeWith :: GirarEntity e => e -> GylerM [NonEmptyText]
+completeWith ent = do
     env <- view girarEnv
     cfg <- view commandsConfig
 
