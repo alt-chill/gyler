@@ -6,8 +6,8 @@
 
 module Gyler.Context.Commands (
     CommandsConfig,
-    gyleConfig, giteryConfig,
-    curlConfig,
+    gyleSsh, giterySsh,
+    girarWeb,
     defCommandsConfig
 ) where
 
@@ -16,16 +16,16 @@ import Gyler.Context.Ssh
 import Gyler.Context.Curl
 
 data CommandsConfig = ExternalCommandsConfig
-    { _gyleConfig   :: !SshConfig
-    , _giteryConfig :: !SshConfig
-    , _curlConfig   :: !CurlConfig
+    { _gyleSsh   :: !(Maybe SshConfig)
+    , _giterySsh :: !(Maybe SshConfig)
+    , _girarWeb  :: !(Maybe CurlConfig)
     } deriving (Show, Eq)
 
 makeLenses ''CommandsConfig
 
 defCommandsConfig :: CommandsConfig
 defCommandsConfig = ExternalCommandsConfig
-    { _gyleConfig   = defSshConfig
-    , _giteryConfig = defSshConfig
-    , _curlConfig   = defCurlConfig
+    { _gyleSsh   = Nothing
+    , _giterySsh = Nothing
+    , _girarWeb  = Nothing
     }

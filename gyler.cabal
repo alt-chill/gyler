@@ -25,6 +25,7 @@ library
                       ,Gyler.GirarEntity.Maintainers
 
                       ,Gyler.Utils.List
+                      ,Gyler.Utils.Errors
 
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv

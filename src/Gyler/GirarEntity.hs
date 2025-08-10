@@ -91,9 +91,13 @@ completeWith ent = do
 
     let exec = toCmd cfg $ getGirarCommand ent
 
-    cache      <- getCachedFile ent
-    (_, output)   <- liftIO $ CF.fetchOrRun cache exec
+    case exec of
+        Right exec' -> do
+            cache      <- getCachedFile ent
+            (_, output)   <- liftIO $ CF.fetchOrRun cache exec'
 
-    case fromText output of
-        Just raw -> return $ parseValue ent env raw
-        Nothing  -> return []
+            case fromText output of
+                Just raw -> return $ parseValue ent env raw
+                Nothing  -> return []
+
+        Left _ -> return []

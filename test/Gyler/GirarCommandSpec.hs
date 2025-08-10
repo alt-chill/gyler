@@ -6,6 +6,7 @@ import Test.Hspec
 import Gyler.GirarCommand
 import Gyler.Context
 import Gyler.Types
+import Gyler.Data.NonEmptyText.Unsafe
 
 import Control.Lens
 import Data.Text (Text)
@@ -27,48 +28,66 @@ spec = describe "toCmd" $ do
 
         fullCurlCfg = defCurlConfig
             & curlExecutable .~ "curl"
-            & curlArgs       .~ ["-X", "POST"]
+            & curlArgs       .~ ["-f"]
 
         emptyCurlCfg = defCurlConfig
             & curlArgs .~ []
 
         cfgFull = defCommandsConfig
-            & gyleConfig   .~ fullSshCfg
-            & giteryConfig .~ fullSshCfg
-            & curlConfig   .~ fullCurlCfg
+            & gyleSsh   ?~ fullSshCfg
+            & giterySsh ?~ fullSshCfg
+            & girarWeb  ?~ fullCurlCfg
 
         cfgMinimal = defCommandsConfig
-            & gyleConfig   .~ minimalSshCfg
-            & giteryConfig .~ minimalSshCfg
-            & curlConfig   .~ emptyCurlCfg
+            & gyleSsh   ?~ minimalSshCfg
+            & giterySsh ?~ minimalSshCfg
+            & girarWeb  ?~ emptyCurlCfg
+
+        cfgEmpty = defCommandsConfig
+            & gyleSsh   .~ Nothing
+            & giterySsh .~ Nothing
+            & girarWeb  .~ Nothing
 
     describe "ViaGyle" $ do
         it "constructs full ssh command with args, port, key" $ do
-            let cmd = toCmd cfgFull (ViaGyle ["--do", "thing"])
-            cmd `shouldBe` ("ssh", ["-v", "alice@example.com", "-p", "2222", "-i", "/path/to/key", "--do", "thing"])
+            let cmd = toCmd cfgFull (ViaGyle ["do", "thing"])
+            cmd `shouldBe` Right ("ssh", ["-v", "-p", "2222", "-i", "/path/to/key", "alice@example.com", "do", "thing"])
 
         it "uses default port 22 and no key when not specified" $ do
-            let cmd = toCmd cfgMinimal (ViaGyle ["--fast"])
-            cmd `shouldBe` ("ssh", ["user@host", "-p", "22", "--fast"])
+            let cmd = toCmd cfgMinimal (ViaGyle [])
+            cmd `shouldBe` Right ("ssh", ["-p", "22", "user@host"])
 
         it "works with empty args" $ do
             let cmd = toCmd cfgFull (ViaGyle [])
-            cmd `shouldBe` ("ssh", ["-v", "alice@example.com", "-p", "2222", "-i", "/path/to/key"])
+            cmd `shouldBe` Right ("ssh", ["-v", "-p", "2222", "-i", "/path/to/key", "alice@example.com"])
 
     describe "ViaGitery" $ do
         it "uses same ssh construction logic as ViaGyle" $ do
-            let cmd = toCmd cfgFull (ViaGitery ["--pull"])
-            cmd `shouldBe` ("ssh", ["-v", "alice@example.com", "-p", "2222", "-i", "/path/to/key", "--pull"])
+            let cmd = toCmd cfgFull (ViaGitery ["task", "ls"])
+            cmd `shouldBe` Right ("ssh", ["-v", "-p", "2222", "-i", "/path/to/key", "alice@example.com", "task", "ls"])
 
         it "works with empty args" $ do
             let cmd = toCmd cfgMinimal (ViaGitery [])
-            cmd `shouldBe` ("ssh", ["user@host", "-p", "22"])
+            cmd `shouldBe` Right ("ssh", ["-p", "22", "user@host"])
 
     describe "ViaCurl" $ do
         it "constructs curl command with args and target" $ do
-            let cmd = toCmd cfgFull (ViaCurl "https://api.site.com/refresh")
-            cmd `shouldBe` ("curl", ["-X", "POST", "https://api.site.com/refresh"])
+            let cmd = toCmd cfgFull (ViaGirarWeb "https://git.altlinux.org/people")
+            cmd `shouldBe` Right ("curl", ["-f", "https://git.altlinux.org/people"])
 
-        it "works with empty curl args" $ do
-            let cmd = toCmd cfgMinimal (ViaCurl "http://simple.com/")
-            cmd `shouldBe` ("curl", ["http://simple.com/"])
+        it "works without curl extra args" $ do
+            let cmd = toCmd cfgMinimal (ViaGirarWeb "https://git.altlinux.org/people")
+            cmd `shouldBe` Right ("curl", ["https://git.altlinux.org/people"])
+
+    describe "Missing config cases" $ do
+        it "returns error when gyleSsh config is missing" $ do
+            let cmd = toCmd cfgEmpty (ViaGyle ["something"])
+            cmd `shouldBe` Left "toCmd (ViaGyle): SshConfig is not available"
+
+        it "returns error when giterySsh config is missing" $ do
+            let cmd = toCmd cfgEmpty (ViaGitery ["task"])
+            cmd `shouldBe` Left "toCmd (ViaGitery): SshConfig is not available"
+
+        it "returns error when girarWeb config is missing" $ do
+            let cmd = toCmd cfgEmpty (ViaGirarWeb "https://missing.config")
+            cmd `shouldBe` Left "toCmd (ViaGirarWeb): CurlConfig is not available"

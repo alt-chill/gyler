@@ -5,7 +5,7 @@
 -- Includes the path to the curl executable and its default arguments.
 
 module Gyler.Context.Curl (
-    CurlConfig,
+    CurlConfig (CurlConfig),
     curlExecutable, curlArgs,
     defCurlConfig
 ) where
@@ -13,7 +13,7 @@ module Gyler.Context.Curl (
 import Control.Lens (makeLenses)
 import Gyler.Data.NonEmptyText.Unsafe (NonEmptyText)
 
-data CurlConfig = CurlCommandConfig
+data CurlConfig = CurlConfig
     { _curlExecutable :: !NonEmptyText
     , _curlArgs       :: ![NonEmptyText]
     } deriving (Show, Eq)
@@ -21,7 +21,7 @@ data CurlConfig = CurlCommandConfig
 makeLenses ''CurlConfig
 
 defCurlConfig :: CurlConfig
-defCurlConfig = CurlCommandConfig
+defCurlConfig = CurlConfig
     { _curlExecutable = "curl"
     , _curlArgs = []
     }
