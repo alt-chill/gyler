@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | The main application context passed throughout Gyler.
@@ -13,10 +14,12 @@ module Gyler.Context.Gyler (
 ) where
 
 import Control.Lens (makeLenses)
-import Gyler.Data.NonEmptyText.Unsafe (NonEmptyText)
 
 import Gyler.Context.Commands
 import Gyler.GirarEnv (GirarEnv)
+
+import Gyler.Data.NonEmptyText (NonEmptyText)
+import Gyler.Data.NonEmptyText.QQ (net)
 
 data GylerContext = GylerContext
     { _commandsConfig :: !CommandsConfig
@@ -32,5 +35,5 @@ defContext = GylerContext
     { _commandsConfig = defCommandsConfig
     , _girarEnv = Nothing
     , _cacheDir = "/tmp"
-    , _altUser = ""
+    , _altUser = [net|user|]
     }

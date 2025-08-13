@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- |
 -- Module      : Gyler.GirarEntity.Maintainers
@@ -21,15 +22,16 @@ import Gyler.GirarEntity (GirarEntity (..))
 import Gyler.GirarCommand (GirarCommand (ViaGitery))
 
 import qualified Gyler.Data.NonEmptyText as NET (lines, words)
+import Gyler.Data.NonEmptyText.QQ (net)
 
-import Data.Maybe (fromMaybe)
+import Data.Maybe (mapMaybe)
 
 import Gyler.Utils.List (safeLast)
 
 data Maintainers = Maintainers deriving (Show, Eq)
 
 instance GirarEntity Maintainers where
-    getGirarCommand _ = ViaGitery ["ls", "/people"]
+    getGirarCommand _ = ViaGitery [[net|ls|], [net|/people|]]
 
     getCachedFilename _ = "maintaines"
 
@@ -49,4 +51,4 @@ instance GirarEntity Maintainers where
     -- splits it into words and takes the last word — assumed to be a maintainer username.
     --
     -- Result is : ["aas", "ab", "abr" ... ]
-    parseValue _ _ = map (fromMaybe "" . safeLast . NET.words) .  drop 1 . NET.lines
+    parseValue _ _ = mapMaybe (safeLast . NET.words) .  drop 1 . NET.lines

@@ -16,6 +16,7 @@
 -- >>> "" :: NonEmptyText
 -- *** Exception: Gyler.Data.NonEmptyText.Unsafe.fromString: empty string literal
 --
+-- ONLY FOR TESTING PURPOSES
 module Gyler.Data.NonEmptyText.Unsafe (
     module Gyler.Data.NonEmptyText   -- re‑export the safe API
   ) where

@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- |
 -- Module      : Gyler.GirarEntity.Branch
@@ -20,11 +21,12 @@ import Gyler.GirarEntity (GirarEntity (..))
 import Gyler.GirarCommand (GirarCommand (ViaGyle))
 
 import qualified Gyler.Data.NonEmptyText as NET (lines)
+import Gyler.Data.NonEmptyText.QQ (net)
 
 data Branches = Branches deriving (Eq, Show)
 
 instance GirarEntity Branches where
-    getGirarCommand _ = ViaGyle ["acl", "--list"]
+    getGirarCommand _ = ViaGyle [[net|acl|], [net|--list|]]
 
     getCachedFilename _ = "branches"
     -- It's not often that new branches appear.

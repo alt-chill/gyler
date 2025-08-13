@@ -2,6 +2,8 @@
 
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveLift #-}
+
 module Gyler.Data.NonEmptyText
     ( NonEmptyText
 
@@ -47,9 +49,11 @@ import GHC.Generics (Generic)
 
 import Data.Maybe (mapMaybe)
 
+import Language.Haskell.TH.Syntax (Lift)
+
 data NonEmptyText =
-  NonEmptyText Char Text.Text
-  deriving (Eq, Ord, NFData, Generic)
+  NonEmptyText !Char !Text.Text
+  deriving (Eq, Ord, NFData, Generic, Lift)
 
 instance Show NonEmptyText where
   show = show . toText

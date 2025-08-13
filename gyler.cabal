@@ -41,7 +41,7 @@ library
                       ,Gyler.Types
 
                       ,Gyler.Data.NonEmptyText
-                      ,Gyler.Data.NonEmptyText.Unsafe
+                      ,Gyler.Data.NonEmptyText.QQ
 
   hs-source-dirs:      src
 
@@ -56,6 +56,7 @@ library
                       ,filepath
                       ,typed-process
                       ,deepseq
+                      ,template-haskell
 
   default-language:    Haskell2010
 
@@ -72,6 +73,8 @@ test-suite gyler-tests
                        Gyler.GirarEntity.MaintainersSpec
 
                        Gyler.Data.NonEmptyTextSpec
+
+                       Gyler.Data.NonEmptyText.Unsafe
 
                        TestUtils
 

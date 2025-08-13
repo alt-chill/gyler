@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings, LambdaCase #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 module Gyler.GirarCommand (
     GirarCommand (..),
@@ -11,6 +12,7 @@ module Gyler.GirarCommand (
 import Control.Lens ((^.))
 import Data.Text (Text)
 import Gyler.Data.NonEmptyText (NonEmptyText)
+import Gyler.Data.NonEmptyText.QQ (net)
 import qualified Gyler.Data.NonEmptyText as NET
 import Data.Maybe (fromMaybe)
 
@@ -46,9 +48,9 @@ argsOf (ViaGirarWeb arg) = [arg]
 -- | Convert SSH configuration into executable command format.
 fromSsh :: Maybe SshConfig -> Either Text Cmd
 fromSsh (Just (SshConfig exec extra user host port key)) =
-    let userHost = user <> "@" <> host
-        portArg  = ["-p", fromMaybe "22" port]
-        keyArg   = maybe [] (\k -> ["-i", k]) key
+    let userHost = user <> [net|@|] <> host
+        portArg  = [[net|-p|], fromMaybe [net|22|] port]
+        keyArg   = maybe [] (\k -> [[net|-i|], k]) key
         args     = extra ++ portArg ++ keyArg ++ [userHost]
     in Right (exec, args)
 fromSsh Nothing = Left "SshConfig is not available"

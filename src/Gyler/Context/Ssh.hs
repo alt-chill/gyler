@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | Configuration for running external SSH commands.
@@ -13,7 +14,9 @@ module Gyler.Context.Ssh (
 ) where
 
 import Control.Lens (makeLenses)
-import Gyler.Data.NonEmptyText.Unsafe (NonEmptyText)
+
+import Gyler.Data.NonEmptyText (NonEmptyText)
+import Gyler.Data.NonEmptyText.QQ (net)
 
 data SshConfig = SshConfig
     { _sshExecutable :: !NonEmptyText
@@ -28,10 +31,10 @@ makeLenses ''SshConfig
 
 defSshConfig :: SshConfig
 defSshConfig = SshConfig
-    { _sshExecutable = "ssh"
+    { _sshExecutable = [net|ssh|]
     , _sshArgs       = []
-    , _remoteUser    = "user"
-    , _remoteHost    = "localhost"
+    , _remoteUser    = [net|user|]
+    , _remoteHost    = [net|localhost|]
     , _remotePort    = Nothing
     , _authKey       = Nothing
     }
