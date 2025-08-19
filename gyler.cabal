@@ -40,6 +40,8 @@ library
 
                       ,Gyler.Types
 
+                      ,Gyler.Data.ValidContainer
+
                       ,Gyler.Data.NonEmptyText
                       ,Gyler.Data.NonEmptyText.QQ
 
