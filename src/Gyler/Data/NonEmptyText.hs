@@ -44,16 +44,28 @@ module Gyler.Data.NonEmptyText
 
 import Control.DeepSeq (NFData)
 import Data.Bifunctor ( bimap )
+
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as TE
+
 import GHC.Generics (Generic)
 
 import Data.Maybe (mapMaybe)
 
 import Language.Haskell.TH.Syntax (Lift)
+import Data.Hashable (Hashable)
+
+import Data.Serialize (Serialize (..))
+
+instance Serialize Text.Text where
+    put = put . TE.encodeUtf8
+    get = TE.decodeUtf8 <$> get
 
 data NonEmptyText =
   NonEmptyText !Char !Text.Text
-  deriving (Eq, Ord, NFData, Generic, Lift)
+  deriving (Eq, Ord, NFData, Generic, Lift, Hashable)
+
+instance Serialize NonEmptyText
 
 instance Show NonEmptyText where
   show = show . toText
