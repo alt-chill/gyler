@@ -74,6 +74,7 @@ test-suite gyler-tests
                        Gyler.GirarEntity.BranchesSpec
                        Gyler.GirarEntity.MaintainersSpec
 
+                       Gyler.Data.NonEmptyText.Arbitrary
                        Gyler.Data.NonEmptyTextSpec
 
                        Gyler.Data.NonEmptyText.Unsafe
@@ -84,6 +85,9 @@ test-suite gyler-tests
                       ,gyler
                       ,hspec
                       ,QuickCheck
+                      ,quickcheck-instances
+                      ,hashable
+                      ,cereal
                       ,bytestring
                       ,text
                       ,directory
