@@ -38,6 +38,9 @@ library
                       ,Gyler.Context.Gyler
                       ,Gyler.Context
 
+                      ,Gyler.Classes.RuntimeValidated
+                      ,Gyler.Classes.RuntimeValidated.Internal
+
                       ,Gyler.Types
 
                       ,Gyler.Data.ValidContainer
