@@ -8,6 +8,8 @@ import qualified Gyler.GirarEntity.MaintainersSpec
 
 import qualified Gyler.Data.NonEmptyTextSpec
 
+import qualified Gyler.Data.ValidContainer.HashSetSpec
+
 main :: IO ()
 main = hspec $ do
   Gyler.CachedFileSpec.spec
@@ -17,3 +19,5 @@ main = hspec $ do
   Gyler.GirarEntity.MaintainersSpec.spec
 
   Gyler.Data.NonEmptyTextSpec.spec
+
+  Gyler.Data.ValidContainer.HashSetSpec.spec

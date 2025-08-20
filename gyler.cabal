@@ -78,10 +78,11 @@ test-suite gyler-tests
                        Gyler.GirarEntity.BranchesSpec
                        Gyler.GirarEntity.MaintainersSpec
 
+                       Gyler.Data.NonEmptyText.Unsafe
                        Gyler.Data.NonEmptyText.Arbitrary
                        Gyler.Data.NonEmptyTextSpec
 
-                       Gyler.Data.NonEmptyText.Unsafe
+                       Gyler.Data.ValidContainer.HashSetSpec
 
                        TestUtils
 
