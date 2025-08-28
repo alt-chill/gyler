@@ -21,6 +21,7 @@ library
                       ,Gyler.CachedFile.Internal
 
                       ,Gyler.Domain.Maintainer
+                      ,Gyler.Domain.Branch
 
                       ,Gyler.FetchSpec
                       ,Gyler.FetchSpec.MaintainersQuery
@@ -88,6 +89,7 @@ test-suite gyler-tests
                        Gyler.Data.NonEmptyTextSpec
 
                        Gyler.Domain.MaintainerSpec
+                       Gyler.Domain.BranchSpec
 
                        Gyler.Data.ValidContainer.HashSetSpec
 

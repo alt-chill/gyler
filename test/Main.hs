@@ -10,6 +10,7 @@ import qualified Gyler.Data.NonEmptyTextSpec
 import qualified Gyler.Data.ValidContainer.HashSetSpec
 
 import qualified Gyler.Domain.MaintainerSpec
+import qualified Gyler.Domain.BranchSpec
 
 main :: IO ()
 main = hspec $ do
@@ -23,3 +24,4 @@ main = hspec $ do
   Gyler.Data.ValidContainer.HashSetSpec.spec
 
   Gyler.Domain.MaintainerSpec.spec
+  Gyler.Domain.BranchSpec.spec
