@@ -20,13 +20,13 @@ library
   exposed-modules:     Gyler.CachedFile
                       ,Gyler.CachedFile.Internal
 
-                      ,Gyler.GirarEntity
-                      ,Gyler.GirarEntity.Branches
-                      ,Gyler.GirarEntity.Maintainers
                       ,Gyler.Domain.Maintainer
+
+                      ,Gyler.FetchSpec
 
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors
+                      ,Gyler.Utils.Maybe
 
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv
@@ -59,6 +59,7 @@ library
                       ,directory
                       ,time
                       ,mtl
+                      ,transformers
                       ,lens
                       ,filepath
                       ,typed-process
@@ -79,8 +80,6 @@ test-suite gyler-tests
   other-modules:       Gyler.CachedFileSpec
                        Gyler.GirarCommandSpec
 
-                       Gyler.GirarEntity.BranchesSpec
-                       Gyler.GirarEntity.MaintainersSpec
 
                        Gyler.Data.NonEmptyText.Unsafe
                        Gyler.Data.NonEmptyText.Arbitrary
