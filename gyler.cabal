@@ -23,6 +23,7 @@ library
                       ,Gyler.GirarEntity
                       ,Gyler.GirarEntity.Branches
                       ,Gyler.GirarEntity.Maintainers
+                      ,Gyler.Domain.Maintainer
 
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors
