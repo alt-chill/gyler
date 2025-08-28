@@ -24,6 +24,7 @@ library
                       ,Gyler.Domain.Branch
 
                       ,Gyler.FetchSpec
+                      ,Gyler.FetchSpec.BranchesQuery
                       ,Gyler.FetchSpec.MaintainersQuery
 
                       ,Gyler.Utils.List
@@ -82,6 +83,7 @@ test-suite gyler-tests
   other-modules:       Gyler.CachedFileSpec
                        Gyler.GirarCommandSpec
 
+                       Gyler.FetchSpec.BranchesQuerySpec
                        Gyler.FetchSpec.MaintainersQuerySpec
 
                        Gyler.Data.NonEmptyText.Unsafe

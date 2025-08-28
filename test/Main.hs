@@ -3,6 +3,7 @@ import Test.Hspec
 import qualified Gyler.CachedFileSpec
 import qualified Gyler.GirarCommandSpec
 
+import qualified Gyler.FetchSpec.BranchesQuerySpec
 import qualified Gyler.FetchSpec.MaintainersQuerySpec
 
 import qualified Gyler.Data.NonEmptyTextSpec
@@ -17,6 +18,7 @@ main = hspec $ do
   Gyler.CachedFileSpec.spec
   Gyler.GirarCommandSpec.spec
 
+  Gyler.FetchSpec.BranchesQuerySpec.spec
   Gyler.FetchSpec.MaintainersQuerySpec.spec
 
   Gyler.Data.NonEmptyTextSpec.spec
