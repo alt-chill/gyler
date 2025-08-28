@@ -4,7 +4,7 @@
 
 module Gyler.Domain.Maintainer (
     Maintainer,
-    MaintainersSet(..)
+    MaintainersSet
 ) where
 
 -- |
@@ -35,6 +35,4 @@ instance RuntimeValidated Maintainer where
     mkUnsafe = Maintainer
     getRaw (Maintainer x) = x
 
-newtype MaintainersSet = MaintainersSet (HashSet Maintainer)
-                         deriving Show
-                         deriving newtype (Eq, Serialize)
+type MaintainersSet = HashSet Maintainer

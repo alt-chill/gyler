@@ -19,12 +19,14 @@ import Gyler.GirarCommand (GirarCommand (ViaGitery))
 
 import Gyler.Utils.List (safeLast)
 
-import Gyler.Domain.Maintainer (MaintainersSet(..))
+import Gyler.Domain.Maintainer (MaintainersSet)
 
 import Gyler.Data.NonEmptyText as NET (fromText, lines, words)
 import Gyler.Data.NonEmptyText.QQ (net)
 
 import Gyler.Classes.RuntimeValidated (mkValidSet)
+
+import Gyler.Data.ValidContainer.HashSet (HashSet)
 
 import Data.Text.Encoding as DTE (decodeLatin1)
 
@@ -63,8 +65,7 @@ instance FetchSpec MaintainersQuery where
     --
     -- At the final step, the HashSet is wrapped with a newtype.
     parseResult _ _ input =
-          MaintainersSet
-        . mkValidSet
+          mkValidSet
         . mapMaybe (safeLast . NET.words)
         . drop 1
         . NET.lines

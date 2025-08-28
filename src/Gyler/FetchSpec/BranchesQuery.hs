@@ -22,7 +22,7 @@ import Gyler.Data.NonEmptyText.QQ (net)
 
 import Gyler.Classes.RuntimeValidated (mkValidSet)
 
-import Gyler.Domain.Branch (BranchesSet(..))
+import Gyler.Domain.Branch (BranchesSet)
 
 import Data.Text.Encoding as DTE (decodeLatin1)
 
@@ -45,7 +45,6 @@ instance FetchSpec BranchesQuery where
     --   sisyphus
     -- So we just split output with '\n' as delimiter
     parseResult _ _ input =
-          BranchesSet
-        . mkValidSet
+          mkValidSet
         . NET.lines
           <$> (NET.fromText . DTE.decodeLatin1 $ input)

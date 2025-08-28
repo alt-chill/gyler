@@ -31,7 +31,7 @@ spec = describe "Gyler.FetchSpec.BranchesQuery" $ do
 
         Just expected <- fmap NET.lines . NET.fromText <$> TIO.readFile "test/golden/FetchSpec/Branches/output.txt"
 
-        let Just (BranchesSet parsed) = parseResult BranchesQuery Nothing input
+        let Just parsed = parseResult BranchesQuery Nothing input
 
             netList = getRaw <$> toList parsed
 

@@ -4,7 +4,7 @@
 
 module Gyler.Domain.Branch (
     Branch,
-    BranchesSet(..)
+    BranchesSet
 ) where
 
 import Gyler.Data.NonEmptyText (NonEmptyText)
@@ -26,6 +26,4 @@ instance RuntimeValidated Branch where
     mkUnsafe = Branch
     getRaw (Branch x) = x
 
-newtype BranchesSet = BranchesSet (HashSet Branch)
-                         deriving Show
-                         deriving newtype (Eq, Serialize)
+type BranchesSet = HashSet Branch
