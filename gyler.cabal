@@ -23,6 +23,7 @@ library
                       ,Gyler.Domain.Maintainer
 
                       ,Gyler.FetchSpec
+                      ,Gyler.FetchSpec.MaintainersQuery
 
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors
@@ -80,6 +81,7 @@ test-suite gyler-tests
   other-modules:       Gyler.CachedFileSpec
                        Gyler.GirarCommandSpec
 
+                       Gyler.FetchSpec.MaintainersQuerySpec
 
                        Gyler.Data.NonEmptyText.Unsafe
                        Gyler.Data.NonEmptyText.Arbitrary
