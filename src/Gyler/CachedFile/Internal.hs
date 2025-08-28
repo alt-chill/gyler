@@ -5,11 +5,11 @@ module Gyler.CachedFile.Internal (
     ,ReadFrom (..)
     ,newFile
     ,newFileDefault
-    ,readCached
+    ,readData
     ,getCachedContent
     ,fileAge
     ,isFileFresh
-    ,readContent
+    ,readFromDisk
     ,writeValue
     ,fetchOrRun
 ) where
@@ -18,15 +18,14 @@ import Data.IORef (IORef, writeIORef, newIORef, readIORef)
 import Data.Time.Clock  (NominalDiffTime, diffUTCTime, getCurrentTime)
 
 import qualified Data.Text as T (Text, pack, unpack)
-import qualified Data.Text.IO as T (hGetContents, writeFile, readFile)
 
-import System.Directory (getModificationTime)
-import Control.Exception (try, catch, IOException, evaluate, SomeException (..))
+import System.Directory (getModificationTime, removeFile)
+import Control.Exception (try, catch, evaluate, SomeException (..))
 
 import System.Process.Typed (proc, readProcessStdout_)
 
 import qualified Data.Text.Encoding as T (decodeUtf8')
-import qualified Data.ByteString as BS (ByteString)
+import qualified Data.ByteString as BS (ByteString, readFile, writeFile)
 import qualified Data.ByteString.Lazy as BL (ByteString, toStrict)
 
 import qualified Gyler.Data.NonEmptyText as NET (unpack)
@@ -39,7 +38,7 @@ import Gyler.Types
 --   - maxStaleAge: duration after which the file is considered stale
 data CachedFile = CachedFile {
     filePath :: !FilePath,
-    cache :: !(IORef (Maybe T.Text)), -- In-memory snapshot to reduce I/O
+    cache :: !(IORef (Maybe BS.ByteString)), -- In-memory snapshot to reduce I/O
     maxStaleAge :: !NominalDiffTime   -- in seconds
 }
 
@@ -62,7 +61,7 @@ newFileDefault file = newFile file defaultTime
     where defaultTime = 120
 
 -- | Returns the current value stored in the in-memory cache
-getCachedContent :: CachedFile -> IO (Maybe T.Text)
+getCachedContent :: CachedFile -> IO (Maybe BS.ByteString)
 getCachedContent file = readIORef (cache file)
 
 -- | Computes the age of the underlying file relative to the current time.
@@ -87,12 +86,12 @@ isFileFresh file = do
 -- | Attempts to read the file from disk and update the in-memory cache.
 -- If reading fails (e.g. due to missing or unreadable file), returns Nothing
 -- and leaves the cache unchanged.
-readContent :: CachedFile -> IO (Maybe T.Text)
-readContent file  = do
-    let handler :: IOException -> IO (Maybe T.Text)
+readFromDisk :: CachedFile -> IO (Maybe BS.ByteString)
+readFromDisk file  = do
+    let handler :: SomeException -> IO (Maybe BS.ByteString)
         handler _ = return Nothing
 
-    content <- fmap Just (T.readFile (filePath file)) `catch` handler
+    content <- fmap Just (BS.readFile (filePath file)) `catch` handler
 
     case content of
         Just _  -> writeIORef (cache file) content
@@ -105,26 +104,38 @@ readContent file  = do
 -- If no value is cached:
 --   - Tries to read from disk if the file is still fresh.
 --   - Returns Nothing if the file is stale or unreadable.
-readCached :: CachedFile -> IO (Maybe T.Text)
-readCached file = do
+readData :: CachedFile -> IO (Maybe BS.ByteString)
+readData file = do
     currentValue <- getCachedContent file
 
     case currentValue of
         Nothing  -> do diffOk <- isFileFresh file
                        if diffOk
-                           then readContent file    -- load from disk
+                           then readFromDisk file    -- load from disk
                            else return Nothing      -- nothing in cache
         v@(Just val) -> return v                    -- cached value
 
 -- | Writes the given value both to the file on disk and to the in-memory cache.
 -- If the file write fails, the cache is still updated in memory.
-writeValue :: CachedFile -> T.Text -> IO ()
+writeValue :: CachedFile -> BS.ByteString -> IO ()
 writeValue file value = do
-    let handler :: IOException -> IO ()
+    let handler :: SomeException -> IO ()
         handler _ = return ()
 
     writeIORef (cache file) (Just value)
-    T.writeFile (filePath file) value `catch` handler
+    BS.writeFile (filePath file) value `catch` handler
+
+-- | Clears the in-memory cache and attempts to remove file from disk.
+--
+-- This operation is unconditional: it does not check if the file exists
+-- or if the process has write permissions. All errors are caught and ignored.
+clearCache :: CachedFile -> IO ()
+clearCache file = do
+    let handler :: SomeException -> IO ()
+        handler _ = return ()
+
+    writeIORef (cache file) Nothing
+    removeFile (filePath file) `catch` handler
 
 -- | Retrieves a value from cache or runs an external command to produce it.
 --
@@ -135,9 +146,9 @@ writeValue file value = do
 --     - On failure (e.g. command fails or output can't be decoded): returns an empty string.
 --
 -- The first value in pair indicates the source of the data: Cache, Executable, or Error.
-fetchOrRun :: CachedFile -> Cmd -> IO (ReadFrom, T.Text)
+fetchOrRun :: CachedFile -> Cmd -> IO (ReadFrom, BS.ByteString)
 fetchOrRun file (exec, args) = do
-    cached <- readCached file
+    cached <- readData file
     case cached of
         Just val -> return (Cache, val)
         Nothing -> do
@@ -148,13 +159,10 @@ fetchOrRun file (exec, args) = do
                     return (Executable, output)
                 Nothing -> return (Error, "")
   where
-    tryRunProcess :: IO (Maybe T.Text)
+    tryRunProcess :: IO (Maybe BS.ByteString)
     tryRunProcess = do
         let process = proc (NET.unpack exec) (map NET.unpack args)
         result <- try (readProcessStdout_  process) :: IO (Either SomeException BL.ByteString)
         return $ case result of
-            Left _ -> Nothing
-            Right outBS ->
-                case T.decodeUtf8' (BL.toStrict outBS) of
-                    Right txt -> Just txt
-                    Left _    -> Nothing
+            Right outBS -> Just . BL.toStrict $ outBS
+            Left _      -> Nothing

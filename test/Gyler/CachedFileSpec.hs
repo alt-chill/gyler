@@ -51,12 +51,6 @@ spec = describe "Gyler.CachedFile" $ do
                 cached <- getCachedContent file
                 cached `shouldBe` Just ""
 
-        it "returns \"\" if output is not valid UTF-8" $
-            withTempFilePath $ \fp -> do
-                file <- newFileDefault fp
-                out <- fetchOrRun file ("head", ["-c", "1000", "/dev/urandom"])
-                out `shouldBe` (Error, "")
-
         it "returns cached value if present" $
             withTempFilePath $ \fp -> do
                 file <- newFileDefault fp
@@ -137,7 +131,7 @@ spec = describe "Gyler.CachedFile" $ do
             cached <- getCachedContent file
             cached `shouldBe` Nothing
 
-    describe "readCached" $ do
+    describe "readData" $ do
         it "always return cached value after reading" $
             withSystemTempFile "test.txt" $ \fp h -> do
                 hPutStr h "hello\n"
@@ -145,7 +139,7 @@ spec = describe "Gyler.CachedFile" $ do
 
                 file <- newFileDefault fp
 
-                value  <- readCached file
+                value  <- readData file
                 cached <- getCachedContent file
 
                 value `shouldBe` Just "hello\n"
@@ -153,7 +147,7 @@ spec = describe "Gyler.CachedFile" $ do
 
                 writeFile fp "ignored"
 
-                value2  <- readCached file
+                value2  <- readData file
                 value2 `shouldBe` value
 
         it "reads and caches content of file" $
@@ -163,7 +157,7 @@ spec = describe "Gyler.CachedFile" $ do
 
                 file <- newFile fp 1000
 
-                value  <- readCached file
+                value  <- readData file
                 cached <- getCachedContent file
 
                 value `shouldBe` Just "hello\n"
@@ -174,12 +168,12 @@ spec = describe "Gyler.CachedFile" $ do
                 hClose h
 
                 file <- newFileDefault fp
-                value <- readCached file
+                value <- readData file
                 value `shouldBe` Just ""
 
         it "returns Nothing for non-existing file" $ do
             file <- newFileDefault "somefile"
-            value <- readCached file
+            value <- readData file
             value `shouldBe` Nothing
 
         it "returns Nothing for stale file" $ do
@@ -190,7 +184,7 @@ spec = describe "Gyler.CachedFile" $ do
                 file <- newFile fp 0.001
                 threadDelay 10000
 
-                value <- readCached file
+                value <- readData file
                 value `shouldBe` Nothing
 
         it "returns Nothing if cache is cleared and file is stale" $ do
@@ -199,25 +193,25 @@ spec = describe "Gyler.CachedFile" $ do
                 hClose h
 
                 file <- newFile fp 0.001
-                _ <- readCached file
+                _ <- readData file
                 threadDelay 10000
 
                 writeIORef (cache file) Nothing
 
-                value <- readCached file
+                value <- readData file
                 value `shouldBe` Nothing
 
-    describe "readContent" $ do
+    describe "readFromDisk" $ do
         it "does not clear cache if reading fails" $
             withSystemTempFile "test.txt" $ \fp h -> do
                 hPutStr h "good"
                 hClose h
 
                 file <- newFileDefault fp
-                _ <- readContent file
+                _ <- readFromDisk file
 
                 removeFile fp
-                failed <- readContent file
+                failed <- readFromDisk file
                 cached <- getCachedContent file
 
                 cached `shouldBe` Just "good"
@@ -229,18 +223,18 @@ spec = describe "Gyler.CachedFile" $ do
                 hClose h
 
                 file <- newFileDefault fp
-                _ <- readContent file
+                _ <- readFromDisk file
                 cached1 <- getCachedContent file
                 cached1 `shouldBe` Just "first"
 
                 writeFile fp "second"
-                _ <- readContent file
+                _ <- readFromDisk file
                 cached2 <- getCachedContent file
                 cached2 `shouldBe` Just "second"
 
         it "returns Nothing for missing file" $ do
             file <- newFileDefault "nonexistent.txt"
-            value <- readContent file
+            value <- readFromDisk file
             value `shouldBe` Nothing
 
     describe "writeValue" $ do

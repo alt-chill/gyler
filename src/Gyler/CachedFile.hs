@@ -3,7 +3,7 @@ module Gyler.CachedFile (
     ,ReadFrom(..)
     ,newFile
     ,newFileDefault
-    ,readCached
+    ,readData
     ,writeValue
     ,fetchOrRun
 ) where
@@ -30,7 +30,7 @@ A 'CachedFile' stores:
 
 * 'newFile': Creates a cache for a file with a custom staleness threshold.
 * 'newFileDefault': Creates a cache with a default threshold of 120 seconds.
-* 'readCached': Retrieves the cached content, reading from disk if cache is empty and file is fresh.
+* 'readData': Retrieves the cached content, reading from disk if cache is empty and file is fresh.
 * 'writeValue': Writes a value both to the file and the cache.
 * 'fetchOrRun': Retrieves content from cache or executes a fallback command to regenerate and cache the file.
 
@@ -43,7 +43,7 @@ A 'CachedFile' stores:
 
 @
 cf <- newFileDefault "output.txt"
-content <- readCached cf
+content <- readData cf
 
 case content of
   Just val -> putStrLn "Loaded from cache or fresh file"
