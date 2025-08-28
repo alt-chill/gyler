@@ -86,6 +86,8 @@ test-suite gyler-tests
                        Gyler.Data.NonEmptyText.Arbitrary
                        Gyler.Data.NonEmptyTextSpec
 
+                       Gyler.Domain.MaintainerSpec
+
                        Gyler.Data.ValidContainer.HashSetSpec
 
                        TestUtils

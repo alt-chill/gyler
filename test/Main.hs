@@ -10,6 +10,8 @@ import qualified Gyler.Data.NonEmptyTextSpec
 
 import qualified Gyler.Data.ValidContainer.HashSetSpec
 
+import qualified Gyler.Domain.MaintainerSpec
+
 main :: IO ()
 main = hspec $ do
   Gyler.CachedFileSpec.spec
@@ -21,3 +23,5 @@ main = hspec $ do
   Gyler.Data.NonEmptyTextSpec.spec
 
   Gyler.Data.ValidContainer.HashSetSpec.spec
+
+  Gyler.Domain.MaintainerSpec.spec
