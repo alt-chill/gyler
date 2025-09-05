@@ -2,9 +2,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module Gyler.Domain.Branch (
-    Branch,
-    BranchesSet
+module Gyler.Domain.PushableBranch (
+    PushableBranch,
+    PushableBranchesSet
 ) where
 
 import Gyler.Data.NonEmptyText (NonEmptyText)
@@ -17,13 +17,13 @@ import Gyler.Data.ValidContainer.HashSet (HashSet)
 import GHC.IsList (IsList)
 import Data.Serialize (Serialize)
 
-newtype Branch = Branch NonEmptyText
+newtype PushableBranch = PushableBranch NonEmptyText
                      deriving Show
                      deriving newtype (Eq, Hashable, Serialize)
 
-instance RuntimeValidated Branch where
-    type Raw Branch = NonEmptyText
-    mkUnsafe = Branch
-    getRaw (Branch x) = x
+instance RuntimeValidated PushableBranch where
+    type Raw PushableBranch = NonEmptyText
+    mkUnsafe = PushableBranch
+    getRaw (PushableBranch x) = x
 
-type BranchesSet = HashSet Branch
+type PushableBranchesSet = HashSet PushableBranch

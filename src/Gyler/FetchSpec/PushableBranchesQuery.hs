@@ -3,15 +3,15 @@
 {-# LANGUAGE TypeFamilies #-}
 
 -- |
--- Module      : Gyler.FetchSpec.BranchesQuery
+-- Module      : Gyler.FetchSpec.PushableBranchesQuery
 -- Description : Fetch spec for listing branches of current girar
 --
 -- The command associated with this spec is:
 --
 -- > ssh gyle acl --list
 
-module Gyler.FetchSpec.BranchesQuery (
-    BranchesQuery (..)
+module Gyler.FetchSpec.PushableBranchesQuery (
+    PushableBranchesQuery (..)
  ) where
 
 import Gyler.FetchSpec (FetchSpec (..))
@@ -22,18 +22,18 @@ import Gyler.Data.NonEmptyText.QQ (net)
 
 import Gyler.Classes.RuntimeValidated (mkValidSet)
 
-import Gyler.Domain.Branch (BranchesSet)
+import Gyler.Domain.PushableBranch (PushableBranchesSet)
 
 import Data.Text.Encoding as DTE (decodeLatin1)
 
-data BranchesQuery = BranchesQuery deriving (Eq, Show)
+data PushableBranchesQuery = PushableBranchesQuery deriving (Eq, Show)
 
-instance FetchSpec BranchesQuery where
-    type Result BranchesQuery = BranchesSet
+instance FetchSpec PushableBranchesQuery where
+    type Result PushableBranchesQuery = PushableBranchesSet
 
     command _ = ViaGyle [[net|acl|], [net|--list|]]
 
-    cacheFileName _ = "branches_set"
+    cacheFileName _ = "pushable_branches_set"
     -- It's not often that new branches appear.
     staleAfter _    = 86400
 

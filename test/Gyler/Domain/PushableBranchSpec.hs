@@ -1,9 +1,9 @@
-module Gyler.Domain.BranchSpec (spec) where
+module Gyler.Domain.PushableBranchSpec (spec) where
 
 import Test.Hspec
 import Test.QuickCheck
 
-import Gyler.Domain.Branch
+import Gyler.Domain.PushableBranch
 import Gyler.Classes.RuntimeValidated.Internal
 import Gyler.Data.ValidContainer.HashSet (HashSet)
 import qualified Gyler.Data.ValidContainer as VC
@@ -12,14 +12,14 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 import Gyler.Data.NonEmptyText.Arbitrary ()
 import Data.Maybe (isNothing)
 
-mkSet :: [NonEmptyText] -> HashSet Branch
+mkSet :: [NonEmptyText] -> HashSet PushableBranch
 mkSet = mkValidSet
 
-mkM :: NonEmptyText -> Branch
+mkM :: NonEmptyText -> PushableBranch
 mkM = mkUnsafe
 
 spec :: Spec
-spec = describe "Branch as RuntimeValidated" $ do
+spec = describe "PushableBranch as RuntimeValidated" $ do
   it "mkValidated succeeds for values in mkValidSet" $
     property $ \xs ->
       not (null xs) ==>

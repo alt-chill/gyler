@@ -21,10 +21,10 @@ library
                       ,Gyler.CachedFile.Internal
 
                       ,Gyler.Domain.Maintainer
-                      ,Gyler.Domain.Branch
+                      ,Gyler.Domain.PushableBranch
 
                       ,Gyler.FetchSpec
-                      ,Gyler.FetchSpec.BranchesQuery
+                      ,Gyler.FetchSpec.PushableBranchesQuery
                       ,Gyler.FetchSpec.MaintainersQuery
 
                       ,Gyler.Utils.List
@@ -83,7 +83,7 @@ test-suite gyler-tests
   other-modules:       Gyler.CachedFileSpec
                        Gyler.GirarCommandSpec
 
-                       Gyler.FetchSpec.BranchesQuerySpec
+                       Gyler.FetchSpec.PushableBranchesQuerySpec
                        Gyler.FetchSpec.MaintainersQuerySpec
 
                        Gyler.Data.NonEmptyText.Unsafe
@@ -91,7 +91,7 @@ test-suite gyler-tests
                        Gyler.Data.NonEmptyTextSpec
 
                        Gyler.Domain.MaintainerSpec
-                       Gyler.Domain.BranchSpec
+                       Gyler.Domain.PushableBranchSpec
 
                        Gyler.Data.ValidContainer.HashSetSpec
 
