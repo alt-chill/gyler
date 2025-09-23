@@ -5,7 +5,7 @@ module Gyler.GylerM (
 
 import Control.Monad.Reader (ReaderT, runReaderT)
 
-import Gyler.Context.Gyler (GylerContext)
+import Gyler.Context (GylerContext)
 
 type GylerM = ReaderT GylerContext IO
 

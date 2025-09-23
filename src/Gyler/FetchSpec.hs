@@ -58,7 +58,7 @@ import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
 import Gyler.GylerM (GylerM)
 import Gyler.GirarCommand (GirarCommand, toCmd)
 import Gyler.GirarEnv (GirarEnv)
-import Gyler.Context.Gyler (girarEnv, commandsConfig, cacheDir)
+import Gyler.Context (girarEnv, commandsConfig, cacheDir)
 import Gyler.Utils.Maybe (rightToMaybe)
 
 import qualified Gyler.CachedFile as CF (CachedFile, newFile, readData, writeValue)

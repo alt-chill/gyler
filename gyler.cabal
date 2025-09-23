@@ -39,7 +39,6 @@ library
                       ,Gyler.Context.Ssh
                       ,Gyler.Context.Curl
                       ,Gyler.Context.Commands
-                      ,Gyler.Context.Gyler
                       ,Gyler.Context
 
                       ,Gyler.Classes.RuntimeValidated
