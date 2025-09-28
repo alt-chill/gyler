@@ -30,6 +30,7 @@ library
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors
                       ,Gyler.Utils.Maybe
+                      ,Gyler.Utils.Parser
 
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv
@@ -72,6 +73,7 @@ library
                       ,cereal
                       ,hashable
                       ,unordered-containers
+                      ,megaparsec
                       ,fast-logger
 
   default-language:    Haskell2010
@@ -116,6 +118,7 @@ test-suite gyler-tests
                       ,filepath
                       ,random
                       ,lens
+                      ,megaparsec
                       ,mtl
 
   default-language:    Haskell2010
