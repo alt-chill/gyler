@@ -34,7 +34,7 @@ module Gyler.Context (
     GylerContext(..),
     defContext,
     commandsConfig, girarEnv, altUser,
-    cacheDir
+    cacheDir, logger
 ) where
 
 import Gyler.Context.Ssh
@@ -48,12 +48,15 @@ import Gyler.GirarEnv (GirarEnv)
 import Gyler.Data.NonEmptyText (NonEmptyText)
 import Gyler.Data.NonEmptyText.QQ (net)
 
+import Gyler.Logging (HasLogger(..), LogFunc)
+
 data GylerContext = GylerContext
     { _commandsConfig :: !CommandsConfig
     , _girarEnv       :: !(Maybe GirarEnv)
     , _cacheDir       :: !FilePath
     , _altUser        :: !NonEmptyText
-    } deriving (Show, Eq)
+    , _logger         :: !LogFunc
+    }
 
 makeLenses ''GylerContext
 
@@ -62,5 +65,9 @@ defContext = GylerContext
     { _commandsConfig = defCommandsConfig
     , _girarEnv = Nothing
     , _cacheDir = "/tmp"
-    , _altUser = [net|user|]
+    , _altUser  = [net|user|]
+    , _logger   = \_ _ -> return ()
     }
+
+instance HasLogger GylerContext where
+    getLogger = _logger

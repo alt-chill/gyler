@@ -31,7 +31,7 @@ spec = describe "Gyler.FetchSpec.PushableBranchesQuery" $ do
 
         Just expected <- fmap NET.lines . NET.fromText <$> TIO.readFile "test/golden/FetchSpec/PushableBranches/output.txt"
 
-        let Just parsed = parseResult PushableBranchesQuery Nothing input
+        let Right parsed = parseResult PushableBranchesQuery Nothing input
 
             netList = getRaw <$> toList parsed
 

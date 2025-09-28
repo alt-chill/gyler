@@ -52,6 +52,8 @@ library
                       ,Gyler.Data.NonEmptyText
                       ,Gyler.Data.NonEmptyText.QQ
 
+                      ,Gyler.Logging
+
   hs-source-dirs:      src
 
   build-depends:      ,base >=4.7 && <5
@@ -70,6 +72,7 @@ library
                       ,cereal
                       ,hashable
                       ,unordered-containers
+                      ,fast-logger
 
   default-language:    Haskell2010
 
@@ -81,6 +84,7 @@ test-suite gyler-tests
 
   other-modules:       Gyler.CachedFileSpec
                        Gyler.GirarCommandSpec
+                       Gyler.LoggingSpec
 
                        Gyler.FetchSpec.PushableBranchesQuerySpec
                        Gyler.FetchSpec.MaintainersQuerySpec
@@ -112,6 +116,7 @@ test-suite gyler-tests
                       ,filepath
                       ,random
                       ,lens
+                      ,mtl
 
   default-language:    Haskell2010
 

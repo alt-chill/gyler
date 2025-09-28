@@ -13,6 +13,8 @@ import qualified Gyler.Data.ValidContainer.HashSetSpec
 import qualified Gyler.Domain.MaintainerSpec
 import qualified Gyler.Domain.PushableBranchSpec
 
+import qualified Gyler.LoggingSpec
+
 main :: IO ()
 main = hspec $ do
   Gyler.CachedFileSpec.spec
@@ -27,3 +29,5 @@ main = hspec $ do
 
   Gyler.Domain.MaintainerSpec.spec
   Gyler.Domain.PushableBranchSpec.spec
+
+  Gyler.LoggingSpec.spec

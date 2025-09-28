@@ -31,7 +31,7 @@ spec = describe "Gyler.FetchSpec.MaintainersQuery" $ do
 
         Just expected <- fmap NET.lines . NET.fromText <$> TIO.readFile "test/golden/FetchSpec/Maintainers/output.txt"
 
-        let Just parsed = parseResult MaintainersQuery Nothing input
+        let Right parsed = parseResult MaintainersQuery Nothing input
 
             netList = getRaw <$> toList parsed
 
