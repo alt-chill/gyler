@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 
@@ -59,16 +60,20 @@ import Gyler.GylerM (GylerM)
 import Gyler.GirarCommand (GirarCommand, toCmd)
 import Gyler.GirarEnv (GirarEnv)
 import Gyler.Context (girarEnv, commandsConfig, cacheDir)
+import Gyler.Logging (logInfo, logDebug, logError)
+
 import Gyler.Utils.Maybe (rightToMaybe)
+import Gyler.Utils.Errors (mkErr)
 
 import qualified Gyler.CachedFile as CF (CachedFile, newFile, readData, writeValue)
 
-import Gyler.Types (Cmd)
+import Gyler.Types (Cmd, showCmd)
 
 import qualified Data.ByteString as BS (ByteString)
 import qualified Data.ByteString.Lazy as BL (ByteString, toStrict)
 
 import qualified Gyler.Data.NonEmptyText as NET (unpack)
+import qualified Data.Text as T (Text, pack)
 
 import Control.Exception (SomeException, try)
 
@@ -80,9 +85,12 @@ import Control.Lens (view)
 import Control.Monad.Trans.Maybe (MaybeT(..), runMaybeT)
 import Control.Applicative ((<|>))
 
+import Data.Bifunctor (bimap)
+
 import System.FilePath ((</>))
 
 import Data.Serialize (Serialize, decode, encode)
+import Data.Text.Encoding (decodeLatin1)
 
 class (Serialize (Result e)) => FetchSpec e where
     type Result e = r | r -> e
@@ -90,7 +98,7 @@ class (Serialize (Result e)) => FetchSpec e where
     command       :: e -> GirarCommand
     cacheFileName :: e -> FilePath
     staleAfter    :: e -> Integer
-    parseResult   :: e -> Maybe GirarEnv -> BS.ByteString -> Maybe (Result e)
+    parseResult   :: e -> Maybe GirarEnv -> BS.ByteString -> Either T.Text (Result e)
 
 -- | Constructs a 'CachedFile' for a given Girar entity.
 --
@@ -124,32 +132,68 @@ prepareCacheFile ent = do
 --     and return it.
 --
 --     If anything goes wrong at this step, the function returns Nothing.
---     fetch :: FetchSpec e => e -> GylerM (Maybe (Result e))
-fetch :: FetchSpec e => e -> GylerM (Maybe (Result e))
+fetch :: (FetchSpec e, Show e) => e -> GylerM (Maybe (Result e))
 fetch ent = do
     env <- view girarEnv
     cfg <- view commandsConfig
     case toCmd cfg (command ent) of
-        Left _    -> pure Nothing
+        Left txt  -> do
+            logInfo . errMsg $ txt
+            return  Nothing
         Right cmd -> runMaybeT $ do
             file <- lift $ prepareCacheFile ent
             readCache file <|> fetchExternal ent file env cmd
   where
+    errMsg = mkErr $ "fetch(" <> T.pack (show ent) <> ")"
+
     readCache :: FetchSpec e => CF.CachedFile -> MaybeT GylerM (Result e)
     readCache file = MaybeT $ do
-        stored <- liftIO $ CF.readData file
-        pure $ stored >>= rightToMaybe . decode
+        logDebug . errMsg $ "Attempting to read value from cache"
+        maybeStored <- liftIO $ CF.readData file
+        case maybeStored of
+            Nothing -> do
+                logDebug . errMsg $ "No cache entry found"
+                pure Nothing
+            Just stored ->
+                case decode stored of
+                    Left err -> do
+                        logDebug . errMsg $ "Failed to decode cached data\n" <> T.pack err
+                        pure Nothing
+                    Right val -> do
+                        logDebug . errMsg $ "Successfully loaded value from cache"
+                        pure (Just val)
 
     fetchExternal :: FetchSpec e => e -> CF.CachedFile -> Maybe GirarEnv -> Cmd -> MaybeT GylerM (Result e)
-    fetchExternal ent file env cmd = do
-        bs  <- MaybeT . lift $ tryRunProcess cmd
-        val <- MaybeT . pure $ parseResult ent env bs
-        liftIO $ CF.writeValue file (encode val)
-        pure val
+    fetchExternal ent file env cmd = MaybeT $ do
+        logDebug . errMsg $ "Executing command: " <> showCmd cmd
+        bs' <- liftIO $ tryRunProcess cmd
+        case bs' of
+            Right bs -> do
+                let  val' = parseResult ent env bs
+                case val' of
+                    Right val -> do
+                        logDebug . errMsg $ "Command executed and output parsed successfully"
+                        liftIO $ CF.writeValue file (encode val)
+                        return (Just val)
+                    Left err  -> do
+                        logError . errMsg $ mconcat
+                            [ "Failed to parse command output\n"
+                            , decodeLatin1 bs
+                            , "\n"
+                            , err
+                            ]
+                        return Nothing
+            Left err  -> do
+                logError . errMsg $ mconcat
+                    [ "Failed to execute command: "
+                    , showCmd cmd
+                    , "\n"
+                    , err
+                    ]
+                return Nothing
 
-    tryRunProcess :: Cmd -> IO (Maybe BS.ByteString)
+    tryRunProcess :: Cmd -> IO (Either T.Text BS.ByteString)
     tryRunProcess (exec, args) = do
         let process = proc (NET.unpack exec) (map NET.unpack args)
         result <- try (readProcessStdout_ process) :: IO (Either SomeException BL.ByteString)
-        pure $ either (const Nothing) (Just . BL.toStrict) result
-
+        pure $ bimap (T.pack . show) BL.toStrict result

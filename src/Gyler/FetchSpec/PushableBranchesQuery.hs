@@ -24,7 +24,11 @@ import Gyler.Classes.RuntimeValidated (mkValidSet)
 
 import Gyler.Domain.PushableBranch (PushableBranchesSet)
 
+import Gyler.Utils.Maybe  (maybeToRight)
+import Gyler.Utils.Errors (mkErr)
+
 import Data.Text.Encoding as DTE (decodeLatin1)
+import Data.Text (pack)
 
 data PushableBranchesQuery = PushableBranchesQuery deriving (Eq, Show)
 
@@ -47,4 +51,8 @@ instance FetchSpec PushableBranchesQuery where
     parseResult _ _ input =
           mkValidSet
         . NET.lines
-          <$> (NET.fromText . DTE.decodeLatin1 $ input)
+          <$> (maybeToRight (errMsg "Empty input") . NET.fromText
+                                                   . DTE.decodeLatin1 $ input)
+
+        where
+            errMsg = mkErr $ "parseResult (" <> (pack . show) PushableBranchesQuery <> ")"

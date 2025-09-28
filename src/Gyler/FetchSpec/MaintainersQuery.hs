@@ -17,7 +17,9 @@ module Gyler.FetchSpec.MaintainersQuery (
 import Gyler.FetchSpec (FetchSpec (..))
 import Gyler.GirarCommand (GirarCommand (ViaGitery))
 
-import Gyler.Utils.List (safeLast)
+import Gyler.Utils.List   (safeLast)
+import Gyler.Utils.Maybe  (maybeToRight)
+import Gyler.Utils.Errors (mkErr)
 
 import Gyler.Domain.Maintainer (MaintainersSet)
 
@@ -29,6 +31,7 @@ import Gyler.Classes.RuntimeValidated (mkValidSet)
 import Gyler.Data.ValidContainer.HashSet (HashSet)
 
 import Data.Text.Encoding as DTE (decodeLatin1)
+import Data.Text (pack)
 
 import Data.Maybe (mapMaybe)
 
@@ -69,4 +72,7 @@ instance FetchSpec MaintainersQuery where
         . mapMaybe (safeLast . NET.words)
         . drop 1
         . NET.lines
-          <$> (NET.fromText . DTE.decodeLatin1 $ input)
+          <$> (maybeToRight (errMsg "Empty input") . NET.fromText
+                                                   . DTE.decodeLatin1 $ input)
+        where
+            errMsg = mkErr $ "parseResult (" <> (pack . show) MaintainersQuery <> ")"
