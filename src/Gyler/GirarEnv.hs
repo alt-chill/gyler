@@ -1,8 +1,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 -- | Represents an environment dynamically loaded from a running Gyle/Girar server.
--- Optionally required for the 'parseValue' function of the 'GirarEntity' typeclass.
--- See 'Gyler.Context' and 'Gyler.GirarEntity' for usage details.
+-- Optionally required for the 'parseResult' function of the 'FetchSpec' typeclass.
+-- See 'Gyler.Context' and 'Gyler.FetchSpec' for usage details.
 
 module Gyler.GirarEnv (
     GirarEnv,
@@ -11,18 +11,21 @@ module Gyler.GirarEnv (
     states
 ) where
 
-import Gyler.Data.NonEmptyText (NonEmptyText)
 import Control.Lens (makeLenses)
 
--- | All values are retrieved via the 'getData' function from a 'GirarEntity'.
+import Gyler.Domain.Branch (BranchesSet)
+import Gyler.Domain.State (StatesSet)
+import Gyler.Domain.Maintainer (MaintainersSet)
+
+-- | All values are retrieved via the fetch function of a 'FetchSpec'.
 --   Correspondences:
---     - _branches    = getData Gyler.GirarEntity.Branches
---     - _states      = getData Gyler.GirarEntity.States
---     - _maintainers = getData Gyler.GirarEntity.Maintainers
+--     - _branches    = fetch Gyler.FetchSpec.BranchesQuery
+--     - _states      = fetch Gyler.FetchSpec.StatesQuery
+--     - _maintainers = fetch Gyler.FetchSpec.MaintainersQuery
 data GirarEnv = GirarEnv
-  { _branches    :: ![NonEmptyText]
-  , _states      :: ![NonEmptyText]
-  , _maintainers :: ![NonEmptyText]
+  { _branches    :: !BranchesSet
+  , _states      :: !StatesSet
+  , _maintainers :: !MaintainersSet
   } deriving (Show, Eq)
 
 makeLenses ''GirarEnv
