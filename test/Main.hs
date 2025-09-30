@@ -3,9 +3,6 @@ import Test.Hspec
 import qualified Gyler.CachedFileSpec
 import qualified Gyler.GirarCommandSpec
 
-import qualified Gyler.FetchSpec.PushableBranchesQuerySpec
-import qualified Gyler.FetchSpec.MaintainersQuerySpec
-
 import qualified Gyler.Data.NonEmptyTextSpec
 
 import qualified Gyler.Data.ValidContainer.HashSetSpec
@@ -15,13 +12,18 @@ import qualified Gyler.Domain.PushableBranchSpec
 
 import qualified Gyler.LoggingSpec
 
+import TestUtils.FetchSpec.Template
+
+import Data.IORef
+import qualified Data.Map as Map
+
+import Gyler.FetchSpec.MaintainersQuery      (MaintainersQuery(..))
+import Gyler.FetchSpec.PushableBranchesQuery (PushableBranchesQuery(..))
+
 main :: IO ()
 main = hspec $ do
   Gyler.CachedFileSpec.spec
   Gyler.GirarCommandSpec.spec
-
-  Gyler.FetchSpec.PushableBranchesQuerySpec.spec
-  Gyler.FetchSpec.MaintainersQuerySpec.spec
 
   Gyler.Data.NonEmptyTextSpec.spec
 
@@ -31,3 +33,7 @@ main = hspec $ do
   Gyler.Domain.PushableBranchSpec.spec
 
   Gyler.LoggingSpec.spec
+
+  beforeAll (newIORef Map.empty) $ do
+    mkFetchSpecTest MaintainersQuery
+    mkFetchSpecTest PushableBranchesQuery

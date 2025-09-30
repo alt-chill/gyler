@@ -92,7 +92,7 @@ import System.FilePath ((</>))
 import Data.Serialize (Serialize, decode, encode)
 import Data.Text.Encoding (decodeLatin1)
 
-class (Serialize (Result e)) => FetchSpec e where
+class (Serialize (Result e), Eq (Result e), Show (Result e), Show e) => FetchSpec e where
     type Result e = r | r -> e
 
     command       :: e -> GirarCommand

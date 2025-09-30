@@ -88,9 +88,6 @@ test-suite gyler-tests
                        Gyler.GirarCommandSpec
                        Gyler.LoggingSpec
 
-                       Gyler.FetchSpec.PushableBranchesQuerySpec
-                       Gyler.FetchSpec.MaintainersQuerySpec
-
                        Gyler.Data.NonEmptyText.Unsafe
                        Gyler.Data.NonEmptyText.Arbitrary
                        Gyler.Data.NonEmptyTextSpec
@@ -101,6 +98,9 @@ test-suite gyler-tests
                        Gyler.Data.ValidContainer.HashSetSpec
 
                        TestUtils
+
+                       TestUtils.FetchSpec
+                       TestUtils.FetchSpec.Template
 
   build-depends:      ,base >=4.7 && <5
                       ,gyler
@@ -120,6 +120,7 @@ test-suite gyler-tests
                       ,lens
                       ,megaparsec
                       ,mtl
+                      ,containers
 
   default-language:    Haskell2010
 
