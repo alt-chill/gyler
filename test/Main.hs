@@ -7,19 +7,26 @@ import qualified Gyler.Data.NonEmptyTextSpec
 
 import qualified Gyler.Data.ValidContainer.HashSetSpec
 
-import qualified Gyler.Domain.MaintainerSpec
-import qualified Gyler.Domain.PushableBranchSpec
-
 import qualified Gyler.LoggingSpec
 
-import TestUtils.FetchSpec.Template
+import Gyler.Data.NonEmptyText.Arbitrary ()
 
-import Data.IORef
-import qualified Data.Map as Map
+import TestUtils.RuntimeValidated.Template (mkRuntimeValidatedTest)
+
+import Gyler.Domain.Maintainer (Maintainer)
+import Gyler.Domain.PushableBranch (PushableBranch)
+import Gyler.Domain.Branch (Branch)
+
+import TestUtils.FetchSpec.Template
 
 import Gyler.FetchSpec.MaintainersQuery      (MaintainersQuery(..))
 import Gyler.FetchSpec.BranchesQuery         (BranchesQuery(..))
 import Gyler.FetchSpec.PushableBranchesQuery (PushableBranchesQuery(..))
+
+import Data.IORef
+import qualified Data.Map as Map
+
+import Data.Proxy (Proxy(..))
 
 main :: IO ()
 main = hspec $ do
@@ -30,8 +37,9 @@ main = hspec $ do
 
   Gyler.Data.ValidContainer.HashSetSpec.spec
 
-  Gyler.Domain.MaintainerSpec.spec
-  Gyler.Domain.PushableBranchSpec.spec
+  mkRuntimeValidatedTest (Proxy :: Proxy Maintainer)
+  mkRuntimeValidatedTest (Proxy :: Proxy Branch)
+  mkRuntimeValidatedTest (Proxy :: Proxy PushableBranch)
 
   Gyler.LoggingSpec.spec
 

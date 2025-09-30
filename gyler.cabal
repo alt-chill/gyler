@@ -94,15 +94,14 @@ test-suite gyler-tests
                        Gyler.Data.NonEmptyText.Arbitrary
                        Gyler.Data.NonEmptyTextSpec
 
-                       Gyler.Domain.MaintainerSpec
-                       Gyler.Domain.PushableBranchSpec
-
                        Gyler.Data.ValidContainer.HashSetSpec
 
                        TestUtils
 
                        TestUtils.FetchSpec
                        TestUtils.FetchSpec.Template
+
+                       TestUtils.RuntimeValidated.Template
 
   build-depends:      ,base >=4.7 && <5
                       ,gyler
