@@ -21,6 +21,7 @@ library
                       ,Gyler.CachedFile.Internal
 
                       ,Gyler.Domain.Maintainer
+                      ,Gyler.Domain.Branch
                       ,Gyler.Domain.PushableBranch
 
                       ,Gyler.FetchSpec
