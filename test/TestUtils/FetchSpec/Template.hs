@@ -59,6 +59,11 @@ mkFetchSpecTest query = describe ("Gyler.FetchSpec." <> show query) $ do
                 Just spec -> expectationFailure $ fname <> " cacheFileName is already used in " <> spec
                 Nothing   -> liftIO $ modifyIORef' seenFilesRef (Map.insert fname (show query))
 
-        it "is only filename" $ \_ -> fname `shouldBe` (takeFileName fname)
-
         it "is not empty" $ \_ -> fname `shouldNotBe` ""
+
+        it "contains only filename" $ \_ -> fname `shouldBe` takeFileName fname
+
+    describe "staleAfter" $ do
+        let staleTime = staleAfter query
+
+        it "is positive" $ \_ -> staleTime `shouldSatisfy` (>0)

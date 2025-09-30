@@ -92,12 +92,14 @@ import System.FilePath ((</>))
 import Data.Serialize (Serialize, decode, encode)
 import Data.Text.Encoding (decodeLatin1)
 
+import Numeric.Natural (Natural)
+
 class (Serialize (Result e), Eq (Result e), Show (Result e), Show e) => FetchSpec e where
     type Result e = r | r -> e
 
     command       :: e -> GirarCommand
     cacheFileName :: e -> FilePath
-    staleAfter    :: e -> Integer
+    staleAfter    :: e -> Natural
     parseResult   :: e -> Maybe GirarEnv -> BS.ByteString -> Either T.Text (Result e)
 
 -- | Constructs a 'CachedFile' for a given Girar entity.
@@ -106,7 +108,7 @@ class (Serialize (Result e), Eq (Result e), Show (Result e), Show e) => FetchSpe
 prepareCacheFile :: FetchSpec e => e -> GylerM CF.CachedFile
 prepareCacheFile ent = do
     let filename = cacheFileName ent
-        age = fromInteger $ staleAfter ent
+        age = fromIntegral $ staleAfter ent
     dir <- view cacheDir
     liftIO $ CF.newFile (dir </> filename) age
 
