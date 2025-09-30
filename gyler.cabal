@@ -25,8 +25,9 @@ library
                       ,Gyler.Domain.PushableBranch
 
                       ,Gyler.FetchSpec
-                      ,Gyler.FetchSpec.PushableBranchesQuery
                       ,Gyler.FetchSpec.MaintainersQuery
+                      ,Gyler.FetchSpec.BranchesQuery
+                      ,Gyler.FetchSpec.PushableBranchesQuery
 
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors

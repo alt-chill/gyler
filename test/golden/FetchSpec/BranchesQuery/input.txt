@@ -1,0 +1,27 @@
+task ls - list tasks
+
+Usage: task ls [options]
+
+Options:
+  --repo=LIST   comma-separated list of repositories to display;
+  --state=LIST  comma-separated list of task states to display;
+  --user=NAME   user name whose tasks to display;
+  --needs-approval=WHO	list tasks that need specific approvals;
+  -h, --help    show this text and exit.
+
+Valid repository names are:
+  4.0 4.1 5.0 5.1 c10f1 c10f2 c6 c7 c7.1 c8 c8.1 c9f1 c9f2 c9m1 c9m2 icarus p10 p11 p5 p6 p7 p8 p9 sisyphus t6 t7, or ALL.
+Default list of repositories is ALL.
+
+Valid task state names are:
+  awaiting building committing done eperm failing failed new pending postponed swept tested, or ALL.
+Default list of task states is:
+  for single user: awaiting building committing eperm failing failed new pending postponed swept tested;
+  for --user=ALL: awaiting building committing failing pending postponed.
+
+Valid user name is
+  any alt_* account name with "alt_" prefix stripped, or ALL.
+Default user name is respublica.
+
+Valid specific approvers are: maint tester
+

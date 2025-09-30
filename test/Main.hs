@@ -18,6 +18,7 @@ import Data.IORef
 import qualified Data.Map as Map
 
 import Gyler.FetchSpec.MaintainersQuery      (MaintainersQuery(..))
+import Gyler.FetchSpec.BranchesQuery         (BranchesQuery(..))
 import Gyler.FetchSpec.PushableBranchesQuery (PushableBranchesQuery(..))
 
 main :: IO ()
@@ -36,4 +37,5 @@ main = hspec $ do
 
   beforeAll (newIORef Map.empty) $ do
     mkFetchSpecTest MaintainersQuery
+    mkFetchSpecTest BranchesQuery
     mkFetchSpecTest PushableBranchesQuery
