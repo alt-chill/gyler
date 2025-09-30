@@ -23,6 +23,7 @@ import TestUtils.FetchSpec.Template
 import Gyler.FetchSpec.MaintainersQuery      (MaintainersQuery(..))
 import Gyler.FetchSpec.BranchesQuery         (BranchesQuery(..))
 import Gyler.FetchSpec.PushableBranchesQuery (PushableBranchesQuery(..))
+import Gyler.FetchSpec.StatesQuery           (StatesQuery(..))
 
 import Data.IORef
 import qualified Data.Map as Map
@@ -49,3 +50,4 @@ main = hspec $ do
     mkFetchSpecTest MaintainersQuery
     mkFetchSpecTest BranchesQuery
     mkFetchSpecTest PushableBranchesQuery
+    mkFetchSpecTest StatesQuery

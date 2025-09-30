@@ -29,6 +29,7 @@ library
                       ,Gyler.FetchSpec.MaintainersQuery
                       ,Gyler.FetchSpec.BranchesQuery
                       ,Gyler.FetchSpec.PushableBranchesQuery
+                      ,Gyler.FetchSpec.StatesQuery
 
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors
