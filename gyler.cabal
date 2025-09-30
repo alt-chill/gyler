@@ -23,6 +23,7 @@ library
                       ,Gyler.Domain.Maintainer
                       ,Gyler.Domain.Branch
                       ,Gyler.Domain.PushableBranch
+                      ,Gyler.Domain.State
 
                       ,Gyler.FetchSpec
                       ,Gyler.FetchSpec.MaintainersQuery

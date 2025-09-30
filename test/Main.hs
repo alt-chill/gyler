@@ -16,6 +16,7 @@ import TestUtils.RuntimeValidated.Template (mkRuntimeValidatedTest)
 import Gyler.Domain.Maintainer (Maintainer)
 import Gyler.Domain.PushableBranch (PushableBranch)
 import Gyler.Domain.Branch (Branch)
+import Gyler.Domain.State (State)
 
 import TestUtils.FetchSpec.Template
 
@@ -40,6 +41,7 @@ main = hspec $ do
   mkRuntimeValidatedTest (Proxy :: Proxy Maintainer)
   mkRuntimeValidatedTest (Proxy :: Proxy Branch)
   mkRuntimeValidatedTest (Proxy :: Proxy PushableBranch)
+  mkRuntimeValidatedTest (Proxy :: Proxy State)
 
   Gyler.LoggingSpec.spec
 
