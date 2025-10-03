@@ -57,9 +57,7 @@ import Data.Hashable (Hashable)
 
 import Data.Serialize (Serialize (..))
 
-instance Serialize Text.Text where
-    put = put . TE.encodeUtf8
-    get = TE.decodeUtf8 <$> get
+import Gyler.Serialize.Text ()
 
 data NonEmptyText =
   NonEmptyText !Char !Text.Text

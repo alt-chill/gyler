@@ -59,6 +59,8 @@ library
 
                       ,Gyler.Logging
 
+                      ,Gyler.Serialize.Text
+
   hs-source-dirs:      src
 
   build-depends:      ,base >=4.7 && <5
