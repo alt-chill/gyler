@@ -54,8 +54,8 @@ import Data.Maybe (mapMaybe)
 
 import Language.Haskell.TH.Syntax (Lift)
 import Data.Hashable (Hashable)
-
 import Data.Serialize (Serialize (..))
+import Gyler.Classes.IsText (IsText(..))
 
 import Gyler.Serialize.Text ()
 
@@ -63,13 +63,20 @@ data NonEmptyText =
   NonEmptyText !Char !Text.Text
   deriving (Eq, Ord, NFData, Generic, Lift, Hashable)
 
-instance Serialize NonEmptyText
+instance IsText NonEmptyText where
+  -- | /O(n)/ Convert to NonEmptyText to Text
+  --
+  -- The 'Data.Text.Text' result is guaranteed to be non-empty. However, this is
+  -- not reflected in the type.
+  toText = uncurry Text.cons . uncons
 
 instance Show NonEmptyText where
   show = show . toText
 
 instance Semigroup NonEmptyText where
   x <> y = append x y
+
+instance Serialize NonEmptyText
 
 -- | /O(1)/ Create a new 'NonEmptyText'
 --
@@ -163,14 +170,6 @@ init = fst . unsnoc
 length :: NonEmptyText -> Int
 length = (1 +) . Text.length . Gyler.Data.NonEmptyText.tail
 {-# INLINE Gyler.Data.NonEmptyText.length #-}
-
--- | /O(n)/ Convert to NonEmptyText to Text.
---
--- The 'Data.Text.Text' result is guaranteed to be non-empty. However, this is
--- not reflected in the type.
-toText :: NonEmptyText -> Text.Text
-toText = uncurry Text.cons . uncons
-
 
 -- | /O(n)/ 'Gyler.Data.NonEmptyText.map' @f@ @t@ is the 'NonEmptyText' obtained by applying @f@ to
 -- each element of @t@.

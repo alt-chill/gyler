@@ -46,6 +46,8 @@ library
                       ,Gyler.Context.Commands
                       ,Gyler.Context
 
+                      ,Gyler.Classes.IsText
+
                       ,Gyler.Classes.RuntimeValidated
                       ,Gyler.Classes.RuntimeValidated.Internal
 
