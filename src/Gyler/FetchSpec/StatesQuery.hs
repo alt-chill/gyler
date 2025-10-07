@@ -24,7 +24,7 @@ import Gyler.Classes.RuntimeValidated (mkValidSet)
 
 import Gyler.Domain.State (StatesSet)
 
-import Gyler.Utils.Parser (Parser, useParser, lexeme, word, symbol)
+import Gyler.Parsers (Parser, useParser, lexeme, word, symbol)
 
 import Text.Megaparsec (try, option, manyTill, anySingle)
 import Text.Megaparsec.Char (char)

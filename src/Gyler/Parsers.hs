@@ -1,13 +1,15 @@
 -- |
--- Module: Gyler.Utils.Parser
+-- Module: Gyler.Parsers
 -- Description: basic parsers combinators, built on top of `Megaparsec`
 
-module Gyler.Utils.Parser (
+module Gyler.Parsers (
     Parser(..),
     useParser,
     lexeme,
     symbol,
-    word
+    word,
+
+    nonEmptyText
 ) where
 
 import Data.Text (Text)
@@ -18,6 +20,8 @@ import qualified Data.Text as T (pack)
 import Text.Megaparsec (Parsec, some, (<|>), empty, parse, eof, errorBundlePretty)
 import Text.Megaparsec.Char (space1, alphaNumChar, markChar)
 import qualified Text.Megaparsec.Char.Lexer as L (lexeme, symbol, space)
+
+import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
 
 type Parser = Parsec Void Text
 
@@ -38,3 +42,10 @@ useParser p s =
     case parse p "" s of
         Left  err -> Left . T.pack $ errorBundlePretty err
         Right val -> Right val
+
+nonEmptyText :: Parser Text -> Parser NonEmptyText
+nonEmptyText p = do
+    t <- p
+    case fromText t of
+        Just net -> return net
+        Nothing  -> fail "Parser returned empty text"

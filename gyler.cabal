@@ -34,7 +34,8 @@ library
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors
                       ,Gyler.Utils.Maybe
-                      ,Gyler.Utils.Parser
+
+                      ,Gyler.Parsers
 
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv
