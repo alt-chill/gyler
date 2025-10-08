@@ -27,6 +27,7 @@ library
 
                       ,Gyler.Domain.RPM.EVR.Epoch
                       ,Gyler.Domain.RPM.EVR.Version
+                      ,Gyler.Domain.RPM.EVR.Release
 
                       ,Gyler.FetchSpec
                       ,Gyler.FetchSpec.MaintainersQuery
@@ -110,6 +111,7 @@ test-suite gyler-tests
                        Gyler.Domain.RPM.EVRSpec
                        Gyler.Domain.RPM.EVR.EpochSpec
                        Gyler.Domain.RPM.EVR.VersionSpec
+                       Gyler.Domain.RPM.EVR.ReleaseSpec
 
                        TestUtils
 
