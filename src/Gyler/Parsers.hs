@@ -9,7 +9,10 @@ module Gyler.Parsers (
     symbol,
     word,
 
-    nonEmptyText
+    nonEmptyText,
+
+    latinAlpha,
+    latinAlphaNum
 ) where
 
 import Data.Text (Text)
@@ -17,11 +20,12 @@ import Data.Void (Void)
 
 import qualified Data.Text as T (pack)
 
-import Text.Megaparsec (Parsec, some, (<|>), empty, parse, eof, errorBundlePretty)
-import Text.Megaparsec.Char (space1, alphaNumChar, markChar)
+import Text.Megaparsec (Parsec, satisfy, some, (<|>), empty, parse, eof, errorBundlePretty)
+import Text.Megaparsec.Char (space1, alphaNumChar, markChar, digitChar)
 import qualified Text.Megaparsec.Char.Lexer as L (lexeme, symbol, space)
 
 import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
+import Data.Char (isAsciiLower, isAsciiUpper)
 
 type Parser = Parsec Void Text
 
@@ -49,3 +53,11 @@ nonEmptyText p = do
     case fromText t of
         Just net -> return net
         Nothing  -> fail "Parser returned empty text"
+
+
+latinAlpha :: Parser Char
+latinAlpha = let isLatinAlpha c = isAsciiLower c || isAsciiUpper c
+             in  satisfy isLatinAlpha
+
+latinAlphaNum :: Parser Char
+latinAlphaNum = latinAlpha <|> digitChar
