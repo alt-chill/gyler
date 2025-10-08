@@ -25,6 +25,8 @@ library
                       ,Gyler.Domain.PushableBranch
                       ,Gyler.Domain.State
 
+                      ,Gyler.Domain.RPM.EVR.Epoch
+
                       ,Gyler.FetchSpec
                       ,Gyler.FetchSpec.MaintainersQuery
                       ,Gyler.FetchSpec.BranchesQuery
@@ -102,6 +104,10 @@ test-suite gyler-tests
                        Gyler.Data.NonEmptyTextSpec
 
                        Gyler.Data.ValidContainer.HashSetSpec
+
+                       Gyler.Domain.RPMSpec
+                       Gyler.Domain.RPM.EVRSpec
+                       Gyler.Domain.RPM.EVR.EpochSpec
 
                        TestUtils
 
