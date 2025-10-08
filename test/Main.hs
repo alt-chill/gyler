@@ -9,6 +9,8 @@ import qualified Gyler.Data.ValidContainer.HashSetSpec
 
 import qualified Gyler.LoggingSpec
 
+import qualified Gyler.Domain.RPMSpec
+
 import Gyler.Data.NonEmptyText.Arbitrary ()
 
 import TestUtils.RuntimeValidated.Template (mkRuntimeValidatedTest)
@@ -51,3 +53,5 @@ main = hspec $ do
     mkFetchSpecTest BranchesQuery
     mkFetchSpecTest PushableBranchesQuery
     mkFetchSpecTest StatesQuery
+
+  Gyler.Domain.RPMSpec.spec
