@@ -40,6 +40,9 @@ module Gyler.Data.NonEmptyText
     -- * Converting to String
     , Gyler.Data.NonEmptyText.pack
     , Gyler.Data.NonEmptyText.unpack
+
+    -- * Breaking strings
+    , Gyler.Data.NonEmptyText.breakOnPenultimate
     ) where
 
 import Control.DeepSeq (NFData)
@@ -56,6 +59,8 @@ import Language.Haskell.TH.Syntax (Lift)
 import Data.Hashable (Hashable)
 import Data.Serialize (Serialize (..))
 import Gyler.Classes.IsText (IsText(..))
+
+import Data.List (intercalate)
 
 import Gyler.Serialize.Text ()
 
@@ -238,3 +243,24 @@ pack = fromText . Text.pack
 unpack :: NonEmptyText -> String
 unpack = Text.unpack . toText
 {-# INLINE Gyler.Data.NonEmptyText.unpack #-}
+
+-- | /O(n)/ -- | Break a NonEmptyText at the penultimate occurrence of a separator.
+--
+-- Returns 'Nothing' if the separator occurs less than twice or if either
+-- resulting part would be empty.
+breakOnPenultimate :: NonEmptyText -> Text.Text -> Maybe (NonEmptyText, NonEmptyText)
+breakOnPenultimate splitter txt =
+    let s    = toText splitter
+        segs = Text.splitOn s txt
+        n    = Prelude.length segs
+    in if n < 3
+       then Nothing
+       else
+         let (prefixSegs, lastTwo) = splitAt (n - 2) segs
+         in case lastTwo of
+              [x1, x2] ->
+                let leftTxt  = Text.intercalate s prefixSegs
+                    rightTxt = x1 <> s <> x2
+                in (,) <$> fromText leftTxt <*> fromText rightTxt
+              _unreachable -> Nothing  -- unreachable, but keeps pattern-match total
+
