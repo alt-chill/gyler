@@ -7,7 +7,7 @@ module Gyler.Domain.RPM.EVR.Version (
     Version,
 
     -- Parser and smart constructor.
-    version,
+    versionP,
     mkVersion
 ) where
 
@@ -42,10 +42,10 @@ newtype Version = Version NonEmptyText
 versionSymbols :: Parser Char
 versionSymbols = latinAlphaNum <|> oneOf ("_.+~" :: String)
 
-version :: Parser Version
-version = Version <$> nonEmptyText (T.pack <$> some versionSymbols)
+versionP :: Parser Version
+versionP = Version <$> nonEmptyText (T.pack <$> some versionSymbols)
 
 mkVersion :: IsText e => e -> Maybe Version
-mkVersion txt = case useParser (version <* eof) (toText txt) of
+mkVersion txt = case useParser (versionP <* eof) (toText txt) of
                 Right ver -> Just ver
                 Left  _   -> Nothing

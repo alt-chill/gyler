@@ -6,7 +6,7 @@ module Gyler.Domain.RPM.EVR.Epoch (
     Epoch(..),
 
     -- Parser and smart constructor.
-    epoch,
+    epochP,
     mkEpoch
 ) where
 
@@ -40,10 +40,10 @@ newtype Epoch = Epoch Natural
 
 instance Serialize Epoch
 
-epoch :: Parser Epoch
-epoch = Epoch <$> (decimal <* char ':')
+epochP :: Parser Epoch
+epochP = Epoch <$> (decimal <* char ':')
 
 mkEpoch :: IsText e => e -> Maybe Epoch
-mkEpoch txt = case useParser (epoch <* eof) (toText txt) of
+mkEpoch txt = case useParser (epochP <* eof) (toText txt) of
                 Right e -> Just e
                 Left  _ -> Nothing

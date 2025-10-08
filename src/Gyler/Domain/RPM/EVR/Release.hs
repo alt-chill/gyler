@@ -7,7 +7,7 @@ module Gyler.Domain.RPM.EVR.Release (
     Release,
 
     -- Parser and smart constructor.
-    release,
+    releaseP,
     mkRelease
 ) where
 
@@ -45,10 +45,10 @@ newtype Release = Release NonEmptyText
 releaseSymbols :: Parser Char
 releaseSymbols = latinAlphaNum <|> oneOf ("_.+~" :: String)
 
-release :: Parser Release
-release = Release <$> nonEmptyText (T.pack <$> some releaseSymbols)
+releaseP :: Parser Release
+releaseP = Release <$> nonEmptyText (T.pack <$> some releaseSymbols)
 
 mkRelease :: IsText e => e -> Maybe Release
-mkRelease txt = case useParser (release <* eof) (toText txt) of
+mkRelease txt = case useParser (releaseP <* eof) (toText txt) of
                 Right ver -> Just ver
                 Left  _   -> Nothing
