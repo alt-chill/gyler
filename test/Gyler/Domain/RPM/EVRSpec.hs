@@ -9,7 +9,7 @@ import qualified Gyler.Domain.RPM.EVR.ReleaseSpec as Release
 import Test.Hspec
 
 spec :: Spec
-spec = do
+spec = describe "EVR" $ do
     Epoch.spec
     Version.spec
     Release.spec

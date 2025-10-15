@@ -25,6 +25,7 @@ library
                       ,Gyler.Domain.PushableBranch
                       ,Gyler.Domain.State
 
+                      ,Gyler.Domain.RPM.VerCmp
                       ,Gyler.Domain.RPM.Symbols
                       ,Gyler.Domain.RPM.Name
                       ,Gyler.Domain.RPM.EVR.Epoch
@@ -110,6 +111,7 @@ test-suite gyler-tests
                        Gyler.Data.ValidContainer.HashSetSpec
 
                        Gyler.Domain.RPMSpec
+                       Gyler.Domain.RPM.VerCmpSpec
                        Gyler.Domain.RPM.NameSpec
                        Gyler.Domain.RPM.EVRSpec
                        Gyler.Domain.RPM.EVR.EpochSpec
