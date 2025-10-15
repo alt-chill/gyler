@@ -25,6 +25,8 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 
 import Gyler.Parsers (Parser, useParser, latinAlphaNum, nonEmptyText)
 
+import Gyler.Domain.RPM.Symbols (releaseChars)
+
 import Text.Megaparsec ((<|>), oneOf, some, eof)
 import Text.Megaparsec.Char (alphaNumChar, char)
 
@@ -43,7 +45,7 @@ newtype Release = Release NonEmptyText
                      deriving newtype (Ord, Hashable, Serialize, IsText)
 
 releaseSymbols :: Parser Char
-releaseSymbols = latinAlphaNum <|> oneOf ("_.+~" :: String)
+releaseSymbols = latinAlphaNum <|> oneOf releaseChars
 
 releaseP :: Parser Release
 releaseP = Release <$> nonEmptyText (T.pack <$> some releaseSymbols)

@@ -22,6 +22,8 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 
 import Gyler.Parsers (Parser, useParser, latinAlphaNum, nonEmptyText)
 
+import Gyler.Domain.RPM.Symbols (versionChars)
+
 import Text.Megaparsec ((<|>), oneOf, some, eof)
 import Text.Megaparsec.Char (char)
 
@@ -40,7 +42,7 @@ newtype Version = Version NonEmptyText
                      deriving newtype (Ord, Hashable, Serialize, IsText)
 
 versionSymbols :: Parser Char
-versionSymbols = latinAlphaNum <|> oneOf ("_.+~" :: String)
+versionSymbols = latinAlphaNum <|> oneOf versionChars
 
 versionP :: Parser Version
 versionP = Version <$> nonEmptyText (T.pack <$> some versionSymbols)

@@ -22,6 +22,8 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 
 import Gyler.Parsers (Parser, useParser, latinAlphaNum, nonEmptyText)
 
+import Gyler.Domain.RPM.Symbols (nameChars)
+
 import Text.Megaparsec ((<|>), oneOf, some, eof)
 import Text.Megaparsec.Char (char)
 
@@ -40,7 +42,7 @@ newtype Name = Name NonEmptyText
                      deriving newtype (Ord, Hashable, Serialize, IsText)
 
 nameSymbols :: Parser Char
-nameSymbols = latinAlphaNum <|> oneOf ("-._+" :: String)
+nameSymbols = latinAlphaNum <|> oneOf nameChars
 
 nameP :: Parser Name
 nameP = Name <$> nonEmptyText (T.pack <$> some nameSymbols)
