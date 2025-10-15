@@ -23,6 +23,7 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 import Gyler.Parsers (Parser, useParser, latinAlphaNum, nonEmptyText)
 
 import Gyler.Domain.RPM.Symbols (versionChars)
+import Gyler.Domain.RPM.VerCmp  (rpmvercmp)
 
 import Text.Megaparsec ((<|>), oneOf, some, eof)
 import Text.Megaparsec.Char (char)
@@ -39,7 +40,10 @@ import Gyler.Classes.IsText (IsText(..))
 
 newtype Version = Version NonEmptyText
                      deriving         (Eq, Show, Generic)
-                     deriving newtype (Ord, Hashable, Serialize, IsText)
+                     deriving newtype (Hashable, Serialize, IsText)
+
+instance Ord Version where
+    compare = rpmvercmp
 
 versionSymbols :: Parser Char
 versionSymbols = latinAlphaNum <|> oneOf versionChars

@@ -26,6 +26,7 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 import Gyler.Parsers (Parser, useParser, latinAlphaNum, nonEmptyText)
 
 import Gyler.Domain.RPM.Symbols (releaseChars)
+import Gyler.Domain.RPM.VerCmp  (rpmvercmp)
 
 import Text.Megaparsec ((<|>), oneOf, some, eof)
 import Text.Megaparsec.Char (alphaNumChar, char)
@@ -42,7 +43,10 @@ import Gyler.Classes.IsText (IsText(..))
 
 newtype Release = Release NonEmptyText
                      deriving         (Eq, Show, Generic)
-                     deriving newtype (Ord, Hashable, Serialize, IsText)
+                     deriving newtype (Hashable, Serialize, IsText)
+
+instance Ord Release where
+    compare = rpmvercmp
 
 releaseSymbols :: Parser Char
 releaseSymbols = latinAlphaNum <|> oneOf releaseChars
