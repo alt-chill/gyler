@@ -28,6 +28,7 @@ library
                       ,Gyler.Domain.RPM.VerCmp
                       ,Gyler.Domain.RPM.Symbols
                       ,Gyler.Domain.RPM.Name
+                      ,Gyler.Domain.RPM.EVR
                       ,Gyler.Domain.RPM.EVR.Epoch
                       ,Gyler.Domain.RPM.EVR.Version
                       ,Gyler.Domain.RPM.EVR.Release
