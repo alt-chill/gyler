@@ -25,6 +25,7 @@ library
                       ,Gyler.Domain.PushableBranch
                       ,Gyler.Domain.State
 
+                      ,Gyler.Domain.RPM
                       ,Gyler.Domain.RPM.VerCmp
                       ,Gyler.Domain.RPM.Symbols
                       ,Gyler.Domain.RPM.Name
