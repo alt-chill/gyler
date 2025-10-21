@@ -51,7 +51,5 @@ versionSymbols = latinAlphaNum <|> oneOf versionChars
 versionP :: Parser Version
 versionP = Version <$> nonEmptyText (T.pack <$> some versionSymbols)
 
-mkVersion :: IsText e => e -> Maybe Version
-mkVersion txt = case useParser (versionP <* eof) (toText txt) of
-                Right ver -> Just ver
-                Left  _   -> Nothing
+mkVersion :: IsText e => e -> Either Text Version
+mkVersion txt = useParser (versionP <* eof) (toText txt)

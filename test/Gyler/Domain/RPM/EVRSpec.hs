@@ -9,10 +9,9 @@ import qualified Gyler.Domain.RPM.EVR.VersionSpec as Version
 import qualified Gyler.Domain.RPM.EVR.ReleaseSpec as Release
 
 import Test.Hspec
-
 import Test.QuickCheck
-import Data.Maybe (isJust, isNothing, fromMaybe)
 
+import Data.Either (isRight, isLeft)
 import qualified Data.Text as T
 
 import Gyler.Domain.RPM.EVR
@@ -35,34 +34,33 @@ evrSpec = parallel $ do
     describe "mkEvr" $ do
         it "parses full EVR with explicit epoch" $ do
           let evr = mkEvr ("1:1.2.3-4" :: T.Text)
-          evr `shouldSatisfy` isJust
+          evr `shouldSatisfy` isRight
 
         it "parses EVR without epoch (defaults to 0)" $ do
-          let evr = mkEvr ("1.2.3-4" :: T.Text)
-          evr `shouldBe` Just (EVR (Epoch 0)
-                                    (fromMaybe (error "bad version") $ mkVersion ("1.2.3" :: T.Text))
-                                    (fromMaybe (error "bad release") $ mkRelease ("4" :: T.Text))
-                                    )
+          let v = either (error . T.unpack) id (mkVersion ("1.2.3" :: T.Text))
+          let r = either (error . T.unpack) id (mkRelease ("4" :: T.Text))
+          let expected = Right (EVR (Epoch 0) v r)
+          mkEvr ("1.2.3-4" :: T.Text) `shouldBe` expected
 
         it "fails on invalid EVR (missing release)" $ do
-          mkEvr ("1.2.3" :: T.Text) `shouldBe` Nothing
+          mkEvr ("1.2.3" :: T.Text) `shouldSatisfy` isLeft
 
         it "fails on invalid characters" $ do
-          mkEvr ("1:1.2.3 4" :: T.Text) `shouldBe` Nothing
+          mkEvr ("1:1.2.3 4" :: T.Text) `shouldSatisfy` isLeft
 
         it "fails on empty string" $ do
-          mkEvr ("" :: T.Text) `shouldBe` Nothing
+          mkEvr ("" :: T.Text) `shouldSatisfy` isLeft
 
     describe "property-based tests" $ do
         it "parses valid EVRs successfully" $
           property $ forAll genValidEvrText $ \txt ->
-            isJust (mkEvr txt)
+            isRight (mkEvr txt)
 
         it "round-trips" $
           property $ forAll genValidEvrText $ \txt ->
             case mkEvr txt of
-              Just evr -> mkEvr (showEVR evr) == Just evr
-              Nothing  -> False
+              Right evr -> mkEvr (showEVR evr) == Right evr
+              Left  _   -> False
 
 
 

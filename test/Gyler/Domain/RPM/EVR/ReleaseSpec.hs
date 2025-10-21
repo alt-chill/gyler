@@ -8,7 +8,7 @@ import qualified Data.Text as T
 
 import Gyler.Domain.RPM.EVR.Release
 import Gyler.Classes.IsText (toText)
-import Data.Maybe (isNothing, isJust)
+import Data.Either (isRight, isLeft)
 
 validReleaseChar :: Gen Char
 validReleaseChar = elements $
@@ -26,29 +26,28 @@ spec :: Spec
 spec = parallel $ describe "Release" $ do
     describe "mkRelease" $ do
         it "fails on empty string" $
-          mkRelease ("" :: T.Text) `shouldBe` Nothing
+          mkRelease ("" :: T.Text) `shouldSatisfy` isLeft
 
-        it "Threats '1.2.3' as correct release" $
-          mkRelease ("1.2.3" :: T.Text) `shouldSatisfy` (/= Nothing)
+        it "Treats '1.2.3' as correct release" $
+          mkRelease ("1.2.3" :: T.Text) `shouldSatisfy` isRight
 
-        it "Threats 'v1_0~beta+build' as correct release" $
-          mkRelease ("v1_0~beta+build" :: T.Text) `shouldSatisfy` (/= Nothing)
+        it "Treats 'v1_0~beta+build' as correct release" $
+          mkRelease ("v1_0~beta+build" :: T.Text) `shouldSatisfy` isRight
 
         it "Fails on '1 2' (spaces are unallowed)" $
-          mkRelease ("1 2" :: T.Text) `shouldBe` Nothing
+          mkRelease ("1 2" :: T.Text) `shouldSatisfy` isLeft
 
     describe "property-based tests" $ do
-        it "returns Just for correct verison strings" $
+        it "returns Right for correct release strings" $
           property $ forAll genValidReleaseText $ \txt ->
-            isJust $ mkRelease txt
+            isRight $ mkRelease txt
 
-        it "returns Nothing for strings with invalid chars" $
+        it "returns Left for strings with invalid chars" $
           property $ forAll genInvalidReleaseText $ \txt ->
-            isNothing $ mkRelease txt
+            isLeft $ mkRelease txt
 
-        it "(mkRelease . toText . fromJust) round-trip" $
+        it "(mkRelease . toText . fromRight) round-trip" $
           property $ forAll genValidReleaseText $ \txt ->
             case mkRelease txt of
-              Just v  -> mkRelease (toText v) == Just v
-              Nothing -> False
-
+              Right v -> mkRelease (toText v) == Right v
+              Left  _ -> False

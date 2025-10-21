@@ -47,7 +47,5 @@ nameSymbols = latinAlphaNum <|> oneOf nameChars
 nameP :: Parser Name
 nameP = Name <$> nonEmptyText (T.pack <$> some nameSymbols)
 
-mkName :: IsText e => e -> Maybe Name
-mkName txt = case useParser (nameP <* eof) (toText txt) of
-                Right ver -> Just ver
-                Left  _   -> Nothing
+mkName :: IsText e => e -> Either Text Name
+mkName txt = useParser (nameP <* eof) (toText txt)

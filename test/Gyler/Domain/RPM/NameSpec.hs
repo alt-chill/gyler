@@ -8,7 +8,7 @@ import qualified Data.Text as T
 
 import Gyler.Domain.RPM.Name
 import Gyler.Classes.IsText (toText)
-import Data.Maybe (isNothing, isJust)
+import Data.Either (isRight, isLeft)
 
 validChars :: [Char]
 validChars = ['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "-._+"
@@ -28,28 +28,28 @@ spec :: Spec
 spec = parallel $ describe "Name" $ do
     describe "mkName" $ do
         it "fails on empty string" $
-          mkName ("" :: T.Text) `shouldBe` Nothing
+          mkName ("" :: T.Text) `shouldSatisfy` isLeft
 
-        it "Threats 'nvidia_glx_470.256.02' as correct package name" $
-          mkName ("nvidia_glx_470.256.02" :: T.Text) `shouldSatisfy` (/= Nothing)
+        it "Treats 'nvidia_glx_470.256.02' as correct package name" $
+          mkName ("nvidia_glx_470.256.02" :: T.Text) `shouldSatisfy` isRight
 
-        it "Threats 'libgtk+extra2' as correct package name" $
-          mkName ("libgtk+extra2" :: T.Text) `shouldSatisfy` (/= Nothing)
+        it "Treats 'libgtk+extra2' as correct package name" $
+          mkName ("libgtk+extra2" :: T.Text) `shouldSatisfy` isRight
 
         it "Fails on '1 2' (spaces are unallowed)" $
-          mkName ("1 2" :: T.Text) `shouldBe` Nothing
+          mkName ("1 2" :: T.Text) `shouldSatisfy` isLeft
 
     describe "property-based tests" $ do
-        it "returns Just for correct verison strings" $
+        it "returns Right for correct name strings" $
           property $ forAll genValidNameText $ \txt ->
-            isJust $ mkName txt
+            isRight $ mkName txt
 
-        it "returns Nothing for strings with invalid chars" $
+        it "returns Left for strings with invalid chars" $
           property $ forAll genInvalidNameText $ \txt ->
-            isNothing $ mkName txt
+            isLeft $ mkName txt
 
-        it "(mkName . toText . fromJust) round-trip" $
+        it "(mkName . toText . fromRight) round-trip" $
           property $ forAll genValidNameText $ \txt ->
             case mkName txt of
-              Just v  -> mkName (toText v) == Just v
-              Nothing -> False
+              Right v -> mkName (toText v) == Right v
+              Left  _ -> False

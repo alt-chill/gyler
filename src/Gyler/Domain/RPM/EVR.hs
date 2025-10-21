@@ -60,7 +60,5 @@ evrP = do
 
     return (EVR e v r)
 
-mkEvr :: IsText e => e -> Maybe EVR
-mkEvr txt = case useParser (evrP <* eof) (toText txt) of
-            Right evr -> Just evr
-            Left  _   -> Nothing
+mkEvr :: IsText e => e -> Either Text EVR
+mkEvr txt = useParser (evrP <* eof) (toText txt)

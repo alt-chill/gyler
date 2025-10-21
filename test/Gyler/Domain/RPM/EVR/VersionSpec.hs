@@ -8,7 +8,7 @@ import qualified Data.Text as T
 
 import Gyler.Domain.RPM.EVR.Version
 import Gyler.Classes.IsText (toText)
-import Data.Maybe (isNothing, isJust)
+import Data.Either (isRight, isLeft)
 
 validVersionChar :: Gen Char
 validVersionChar = elements $
@@ -26,29 +26,28 @@ spec :: Spec
 spec = parallel $ describe "Version" $ do
     describe "mkVersion" $ do
         it "fails on empty string" $
-          mkVersion ("" :: T.Text) `shouldBe` Nothing
+          mkVersion ("" :: T.Text) `shouldSatisfy` isLeft
 
-        it "Threats '1.2.3' as correct version" $
-          mkVersion ("1.2.3" :: T.Text) `shouldSatisfy` (/= Nothing)
+        it "Treats '1.2.3' as correct version" $
+          mkVersion ("1.2.3" :: T.Text) `shouldSatisfy` isRight
 
-        it "Threats 'v1_0~beta+build' as correct version" $
-          mkVersion ("v1_0~beta+build" :: T.Text) `shouldSatisfy` (/= Nothing)
+        it "Treats 'v1_0~beta+build' as correct version" $
+          mkVersion ("v1_0~beta+build" :: T.Text) `shouldSatisfy` isRight
 
         it "Fails on '1 2' (spaces are unallowed)" $
-          mkVersion ("1 2" :: T.Text) `shouldBe` Nothing
+          mkVersion ("1 2" :: T.Text) `shouldSatisfy` isLeft
 
     describe "property-based tests" $ do
-        it "returns Just for correct verison strings" $
+        it "returns Right for correct version strings" $
           property $ forAll genValidVersionText $ \txt ->
-            isJust $ mkVersion txt
+            isRight $ mkVersion txt
 
-        it "returns Nothing for strings with invalid chars" $
+        it "returns Left for strings with invalid chars" $
           property $ forAll genInvalidVersionText $ \txt ->
-            isNothing $ mkVersion txt
+            isLeft $ mkVersion txt
 
-        it "(mkVersion . toText . fromJust) round-trip" $
+        it "(mkVersion . toText . fromRight) round-trip" $
           property $ forAll genValidVersionText $ \txt ->
             case mkVersion txt of
-              Just v  -> mkVersion (toText v) == Just v
-              Nothing -> False
-
+              Right v -> mkVersion (toText v) == Right v
+              Left  _ -> False

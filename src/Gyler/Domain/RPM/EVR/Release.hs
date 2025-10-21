@@ -54,7 +54,5 @@ releaseSymbols = latinAlphaNum <|> oneOf releaseChars
 releaseP :: Parser Release
 releaseP = Release <$> nonEmptyText (T.pack <$> some releaseSymbols)
 
-mkRelease :: IsText e => e -> Maybe Release
-mkRelease txt = case useParser (releaseP <* eof) (toText txt) of
-                Right ver -> Just ver
-                Left  _   -> Nothing
+mkRelease :: IsText e => e -> Either Text Release
+mkRelease txt = useParser (releaseP <* eof) (toText txt)

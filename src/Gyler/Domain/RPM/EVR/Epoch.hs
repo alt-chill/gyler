@@ -43,7 +43,5 @@ instance Serialize Epoch
 epochP :: Parser Epoch
 epochP = Epoch <$> (decimal <* char ':')
 
-mkEpoch :: IsText e => e -> Maybe Epoch
-mkEpoch txt = case useParser (epochP <* eof) (toText txt) of
-                Right e -> Just e
-                Left  _ -> Nothing
+mkEpoch :: IsText e => e -> Either Text Epoch
+mkEpoch txt = useParser (epochP <* eof) (toText txt)
