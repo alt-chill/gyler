@@ -60,12 +60,12 @@ import Gyler.GylerM (GylerM)
 import Gyler.GirarCommand (GirarCommand, toCmd)
 import Gyler.GirarEnv (GirarEnv)
 import Gyler.Context (girarEnv, commandsConfig, cacheDir)
-import Gyler.Logging (logInfo, logDebug, logError)
 
 import Gyler.Utils.Maybe (rightToMaybe)
 import Gyler.Utils.Errors (mkErr)
 
-import qualified Gyler.CachedFile as CF (CachedFile, newFile, readData, writeValue)
+import qualified Gyler.CachedFile as CF     (CachedFile, newFile, readData, writeValue)
+import qualified Gyler.Logging    as Logger (logInfo, logDebug, logError)
 
 import Gyler.Types (Cmd, showCmd)
 
@@ -140,7 +140,7 @@ fetch ent = do
     cfg <- view commandsConfig
     case toCmd cfg (command ent) of
         Left txt  -> do
-            logInfo . errMsg $ txt
+            logInfo txt
             return  Nothing
         Right cmd -> runMaybeT $ do
             file <- lift $ prepareCacheFile ent
@@ -148,37 +148,41 @@ fetch ent = do
   where
     errMsg = mkErr $ "fetch(" <> T.pack (show ent) <> ")"
 
+    logDebug = Logger.logDebug . errMsg
+    logInfo  = Logger.logInfo  . errMsg
+    logError = Logger.logError . errMsg
+
     readCache :: FetchSpec e => CF.CachedFile -> MaybeT GylerM (Result e)
     readCache file = MaybeT $ do
-        logDebug . errMsg $ "Attempting to read value from cache"
+        logDebug "Attempting to read value from cache"
         maybeStored <- liftIO $ CF.readData file
         case maybeStored of
             Nothing -> do
-                logDebug . errMsg $ "No cache entry found"
+                logDebug "No cache entry found"
                 pure Nothing
             Just stored ->
                 case decode stored of
                     Left err -> do
-                        logDebug . errMsg $ "Failed to decode cached data\n" <> T.pack err
+                        logDebug $ "Failed to decode cached data\n" <> T.pack err
                         pure Nothing
                     Right val -> do
-                        logDebug . errMsg $ "Successfully loaded value from cache"
+                        logDebug "Successfully loaded value from cache"
                         pure (Just val)
 
     fetchExternal :: FetchSpec e => e -> CF.CachedFile -> Maybe GirarEnv -> Cmd -> MaybeT GylerM (Result e)
     fetchExternal ent file env cmd = MaybeT $ do
-        logDebug . errMsg $ "Executing command: " <> showCmd cmd
+        logDebug $ "Executing command: " <> showCmd cmd
         bs' <- liftIO $ tryRunProcess cmd
         case bs' of
             Right bs -> do
                 let  val' = parseResult ent env bs
                 case val' of
                     Right val -> do
-                        logDebug . errMsg $ "Command executed and output parsed successfully"
+                        logDebug "Command executed and output parsed successfully"
                         liftIO $ CF.writeValue file (encode val)
                         return (Just val)
                     Left err  -> do
-                        logError . errMsg $ mconcat
+                        logError $ mconcat
                             [ "Failed to parse command output\n"
                             , decodeLatin1 bs
                             , "\n"
@@ -186,7 +190,7 @@ fetch ent = do
                             ]
                         return Nothing
             Left err  -> do
-                logError . errMsg $ mconcat
+                logError $ mconcat
                     [ "Failed to execute command: "
                     , showCmd cmd
                     , "\n"
