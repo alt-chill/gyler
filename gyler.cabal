@@ -61,6 +61,8 @@ library
                       ,Gyler.Classes.RuntimeValidated
                       ,Gyler.Classes.RuntimeValidated.Internal
 
+                      ,Gyler.Classes.Renderable
+
                       ,Gyler.Types
 
                       ,Gyler.Data.ValidContainer
