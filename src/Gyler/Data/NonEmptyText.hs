@@ -58,7 +58,9 @@ import Data.Maybe (mapMaybe)
 import Language.Haskell.TH.Syntax (Lift)
 import Data.Hashable (Hashable)
 import Data.Serialize (Serialize (..))
-import Gyler.Classes.IsText (IsText(..))
+
+import Gyler.Classes.IsText     (IsText(..))
+import Gyler.Classes.Renderable (Renderable(..))
 
 import Data.List (intercalate)
 
@@ -81,7 +83,8 @@ instance Show NonEmptyText where
 instance Semigroup NonEmptyText where
   x <> y = append x y
 
-instance Serialize NonEmptyText
+instance Serialize  NonEmptyText
+instance Renderable NonEmptyText
 
 -- | /O(1)/ Create a new 'NonEmptyText'
 --
