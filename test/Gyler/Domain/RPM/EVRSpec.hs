@@ -18,8 +18,8 @@ import Gyler.Domain.RPM.EVR
 import Gyler.Domain.RPM.EVR.Epoch   (Epoch(..))
 import Gyler.Domain.RPM.EVR.Version (mkVersion)
 import Gyler.Domain.RPM.EVR.Release (mkRelease)
+import Gyler.Classes.Renderable (Renderable(..))
 import Gyler.Classes.IsText (toText)
-
 
 spec :: Spec
 spec = parallel $ describe "EVR" $ do
@@ -59,7 +59,7 @@ evrSpec = parallel $ do
         it "round-trips" $
           property $ forAll genValidEvrText $ \txt ->
             case mkEvr txt of
-              Right evr -> mkEvr (showEVR evr) == Right evr
+              Right evr -> mkEvr (render evr) == Right evr
               Left  _   -> False
 
 
@@ -71,6 +71,3 @@ genValidEvrText = do
   v <- listOf1 $ elements (['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "._+~")
   r <- listOf1 $ elements (['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "._+~")
   pure . T.pack $ e <> v <> "-" <> r
-
-showEVR :: EVR -> T.Text
-showEVR (EVR (Epoch e) v r) = (T.pack . show) e <> ":" <> toText v <> "-" <> toText r

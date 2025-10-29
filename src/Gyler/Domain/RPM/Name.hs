@@ -35,11 +35,12 @@ import GHC.Generics (Generic)
 import Data.Hashable (Hashable)
 import Data.Serialize (Serialize)
 
-import Gyler.Classes.IsText (IsText(..))
+import Gyler.Classes.IsText     (IsText(..))
+import Gyler.Classes.Renderable (Renderable(..))
 
 newtype Name = Name NonEmptyText
                      deriving         (Eq, Show, Generic)
-                     deriving newtype (Ord, Hashable, Serialize, IsText)
+                     deriving newtype (Ord, Hashable, Serialize, IsText, Renderable)
 
 nameSymbols :: Parser Char
 nameSymbols = latinAlphaNum <|> oneOf nameChars

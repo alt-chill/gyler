@@ -32,13 +32,18 @@ import GHC.Generics (Generic)
 import Data.Hashable (Hashable)
 import Data.Serialize (Serialize)
 
-import Gyler.Classes.IsText (IsText(..))
+import TextShow (showt)
 
+import Gyler.Classes.IsText     (IsText(..))
+import Gyler.Classes.Renderable (Renderable(..))
 
 newtype Epoch = Epoch Natural
                     deriving (Eq, Show, Ord, Hashable, Generic)
 
 instance Serialize Epoch
+
+instance Renderable Epoch where
+    render (Epoch n) = showt n
 
 epochP :: Parser Epoch
 epochP = Epoch <$> (decimal <* char ':')

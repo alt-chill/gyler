@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Gyler.Domain.RPM.EVR (
     EVR(..),
@@ -12,7 +13,8 @@ import Gyler.Domain.RPM.EVR.Release (Release, releaseP)
 
 import Gyler.Domain.RPM.VerCmp (rpmvercmp)
 
-import Gyler.Classes.IsText (IsText (..))
+import Gyler.Classes.IsText     (IsText (..))
+import Gyler.Classes.Renderable (Renderable(..))
 
 import Gyler.Parsers (Parser, useParser)
 
@@ -49,6 +51,13 @@ instance Ord EVR where
     compare (EVR e1 v1 r1) (EVR e2 v2 r2)  = compare e1 e2
                                           <> compare v1 v2
                                           <> compare r1 r2
+
+instance Renderable EVR where
+    render (EVR e v r) = renderEpoch e <> render v <> "-" <> render r
+        where
+        renderEpoch :: Epoch -> Text
+        renderEpoch (Epoch 0) = ""
+        renderEpoch e = render e <> ":"
 
 {-# ANN module ("HLint: ignore Use <$>" :: String) #-}
 evrP :: Parser EVR

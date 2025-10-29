@@ -36,11 +36,12 @@ import GHC.Generics (Generic)
 import Data.Hashable (Hashable)
 import Data.Serialize (Serialize)
 
-import Gyler.Classes.IsText (IsText(..))
+import Gyler.Classes.IsText     (IsText(..))
+import Gyler.Classes.Renderable (Renderable(..))
 
 newtype Version = Version NonEmptyText
                      deriving         (Eq, Show, Generic)
-                     deriving newtype (Hashable, Serialize, IsText)
+                     deriving newtype (Hashable, Serialize, IsText, Renderable)
 
 instance Ord Version where
     compare = rpmvercmp
