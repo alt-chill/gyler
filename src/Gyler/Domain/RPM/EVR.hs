@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Gyler.Domain.RPM.EVR (
     EVR(..),
@@ -15,6 +16,7 @@ import Gyler.Domain.RPM.VerCmp (rpmvercmp)
 
 import Gyler.Classes.IsText     (IsText (..))
 import Gyler.Classes.Renderable (Renderable(..))
+import Gyler.Serialize          (deriveIDSerializable)
 
 import Gyler.Parsers (Parser, useParser)
 
@@ -44,7 +46,6 @@ data EVR = EVR {
     _release :: !Release
 } deriving (Show, Eq, Generic)
 
-instance Serialize EVR
 instance Hashable  EVR
 
 instance Ord EVR where
@@ -58,6 +59,8 @@ instance Renderable EVR where
         renderEpoch :: Epoch -> Text
         renderEpoch (Epoch 0) = ""
         renderEpoch e = render e <> ":"
+
+$(deriveIDSerializable [t| EVR |])
 
 {-# ANN module ("HLint: ignore Use <$>" :: String) #-}
 evrP :: Parser EVR

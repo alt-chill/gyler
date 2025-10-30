@@ -1,6 +1,7 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Gyler.Domain.RPM.EVR.Version (
     -- Data type. Constructor is not exported.
@@ -38,13 +39,16 @@ import Data.Serialize (Serialize)
 
 import Gyler.Classes.IsText     (IsText(..))
 import Gyler.Classes.Renderable (Renderable(..))
+import Gyler.Serialize          (deriveIDSerializable)
 
 newtype Version = Version NonEmptyText
                      deriving         (Eq, Show, Generic)
-                     deriving newtype (Hashable, Serialize, IsText, Renderable)
+                     deriving newtype (Hashable, IsText, Renderable)
 
 instance Ord Version where
     compare = rpmvercmp
+
+$(deriveIDSerializable [t| Version |])
 
 versionSymbols :: Parser Char
 versionSymbols = latinAlphaNum <|> oneOf versionChars

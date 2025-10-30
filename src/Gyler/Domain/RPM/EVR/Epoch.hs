@@ -1,5 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Gyler.Domain.RPM.EVR.Epoch (
     -- Data type.
@@ -36,14 +37,15 @@ import TextShow (showt)
 
 import Gyler.Classes.IsText     (IsText(..))
 import Gyler.Classes.Renderable (Renderable(..))
+import Gyler.Serialize          (deriveIDSerializable)
 
 newtype Epoch = Epoch Natural
                     deriving (Eq, Show, Ord, Hashable, Generic)
 
-instance Serialize Epoch
-
 instance Renderable Epoch where
     render (Epoch n) = showt n
+
+$(deriveIDSerializable [t| Epoch |])
 
 epochP :: Parser Epoch
 epochP = Epoch <$> (decimal <* char ':')

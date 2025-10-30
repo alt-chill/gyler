@@ -1,6 +1,7 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Gyler.Domain.RPM.Name (
     -- Data type. Constructor is not exported.
@@ -37,10 +38,13 @@ import Data.Serialize (Serialize)
 
 import Gyler.Classes.IsText     (IsText(..))
 import Gyler.Classes.Renderable (Renderable(..))
+import Gyler.Serialize          (deriveIDSerializable)
 
 newtype Name = Name NonEmptyText
                      deriving         (Eq, Show, Generic)
-                     deriving newtype (Ord, Hashable, Serialize, IsText, Renderable)
+                     deriving newtype (Ord, Hashable, IsText, Renderable)
+
+$(deriveIDSerializable [t| Name |])
 
 nameSymbols :: Parser Char
 nameSymbols = latinAlphaNum <|> oneOf nameChars

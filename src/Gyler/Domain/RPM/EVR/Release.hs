@@ -1,6 +1,7 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Gyler.Domain.RPM.EVR.Release (
     -- Data type. Constructor is not exported.
@@ -41,13 +42,16 @@ import Data.Serialize (Serialize)
 
 import Gyler.Classes.IsText     (IsText(..))
 import Gyler.Classes.Renderable (Renderable(..))
+import Gyler.Serialize          (deriveIDSerializable)
 
 newtype Release = Release NonEmptyText
                      deriving         (Eq, Show, Generic)
-                     deriving newtype (Hashable, Serialize, IsText, Renderable)
+                     deriving newtype (Hashable, IsText, Renderable)
 
 instance Ord Release where
     compare = rpmvercmp
+
+$(deriveIDSerializable [t| Release |])
 
 releaseSymbols :: Parser Char
 releaseSymbols = latinAlphaNum <|> oneOf releaseChars
