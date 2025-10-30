@@ -73,6 +73,8 @@ library
 
                       ,Gyler.Logging
 
+                      ,Gyler.Serialize
+                      ,Gyler.Serialize.UniqID
                       ,Gyler.Serialize.Text
 
   hs-source-dirs:      src
