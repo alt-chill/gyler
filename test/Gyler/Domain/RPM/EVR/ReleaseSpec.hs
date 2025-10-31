@@ -10,12 +10,21 @@ import Gyler.Domain.RPM.EVR.Release
 import Gyler.Classes.IsText (toText)
 import Data.Either (isRight, isLeft)
 
+import TestUtils.Serialize.Template (mkSerializeTest)
+import Data.Proxy (Proxy(..))
+
 validReleaseChar :: Gen Char
 validReleaseChar = elements $
     ['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "._+~"
 
 genValidReleaseText :: Gen T.Text
 genValidReleaseText = T.pack <$> listOf1 validReleaseChar
+
+instance Arbitrary Release where
+    arbitrary = right . mkRelease <$> genValidReleaseText
+        where
+        right :: Either a b -> b
+        right (Right x) = x
 
 genInvalidReleaseText :: Gen T.Text
 genInvalidReleaseText = T.pack <$> listOf1 (suchThat arbitrary invalidChar)
@@ -51,3 +60,5 @@ spec = parallel $ describe "Release" $ do
             case mkRelease txt of
               Right v -> mkRelease (toText v) == Right v
               Left  _ -> False
+
+        mkSerializeTest (Proxy :: Proxy Release)

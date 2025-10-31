@@ -10,12 +10,21 @@ import Gyler.Domain.RPM.EVR.Version
 import Gyler.Classes.IsText (toText)
 import Data.Either (isRight, isLeft)
 
+import TestUtils.Serialize.Template (mkSerializeTest)
+import Data.Proxy (Proxy(..))
+
 validVersionChar :: Gen Char
 validVersionChar = elements $
     ['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "._+~"
 
 genValidVersionText :: Gen T.Text
 genValidVersionText = T.pack <$> listOf1 validVersionChar
+
+instance Arbitrary Version where
+    arbitrary = right . mkVersion <$> genValidVersionText
+        where
+        right :: Either a b -> b -- partial
+        right (Right x) = x
 
 genInvalidVersionText :: Gen T.Text
 genInvalidVersionText = T.pack <$> listOf1 (suchThat arbitrary invalidChar)
@@ -51,3 +60,6 @@ spec = parallel $ describe "Version" $ do
             case mkVersion txt of
               Right v -> mkVersion (toText v) == Right v
               Left  _ -> False
+
+
+        mkSerializeTest (Proxy :: Proxy Version)

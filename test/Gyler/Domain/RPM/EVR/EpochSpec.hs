@@ -12,6 +12,9 @@ import Numeric.Natural (Natural)
 
 import Gyler.Domain.RPM.EVR.Epoch
 
+import TestUtils.Serialize.Template (mkSerializeTest)
+import Data.Proxy (Proxy(..))
+
 -- | Property: mkEpoch (show n <> ":") == Right (Epoch n)
 prop_mkEpoch_roundtrip :: Natural -> Bool
 prop_mkEpoch_roundtrip n =
@@ -21,6 +24,9 @@ prop_mkEpoch_roundtrip n =
 prop_mkEpoch_missing_colon :: Natural -> Bool
 prop_mkEpoch_missing_colon n =
   isLeft $ mkEpoch (pack (show n))
+
+instance Arbitrary Epoch where
+    arbitrary = Epoch <$> arbitrary
 
 spec :: Spec
 spec = describe "Epoch" $ do
@@ -53,3 +59,5 @@ spec = describe "Epoch" $ do
 
     it "returns Left when colon is missing" $
       property prop_mkEpoch_missing_colon
+
+    mkSerializeTest (Proxy :: Proxy Epoch)
