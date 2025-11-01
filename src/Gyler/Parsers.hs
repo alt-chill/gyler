@@ -14,6 +14,7 @@ module Gyler.Parsers (
     latinAlpha,
     latinAlphaNum,
 
+    hasPrefix,
     require,
     requireRight
 ) where
@@ -24,7 +25,7 @@ import Data.Void (Void)
 import qualified Data.Text as T (pack, unpack)
 
 import Text.Megaparsec (Parsec, satisfy, some, (<|>), empty, parse, eof, errorBundlePretty)
-import Text.Megaparsec.Char (space1, alphaNumChar, markChar, digitChar)
+import Text.Megaparsec.Char (space1, alphaNumChar, markChar, digitChar, string)
 import qualified Text.Megaparsec.Char.Lexer as L (lexeme, symbol, space)
 
 import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
@@ -64,6 +65,10 @@ latinAlpha = let isLatinAlpha c = isAsciiLower c || isAsciiUpper c
 
 latinAlphaNum :: Parser Char
 latinAlphaNum = latinAlpha <|> digitChar
+
+-- | Ensures the given prefix is present, then parses the rest.
+hasPrefix :: Text -> Parser a -> Parser a
+hasPrefix prefix p = string prefix *> p
 
 -- | Fails if 'Nothing' with the given error message.
 require :: MonadFail m => String -> Maybe a -> m a
