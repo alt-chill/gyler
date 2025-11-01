@@ -4,7 +4,8 @@ module Gyler.Domain.RPM.Symbols (
     separators,
     versionChars,
     releaseChars,
-    nameChars
+    nameChars,
+    rpmChars
 ) where
 
 -- | Module: Gyler.Domain.RPM.Symbols
@@ -20,3 +21,6 @@ releaseChars = versionChars
 
 nameChars :: String
 nameChars = '-' : separators
+
+rpmChars :: String
+rpmChars = ':' : '-' : '~' : separators
