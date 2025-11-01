@@ -12,7 +12,7 @@
 module Gyler.Domain.RPM (
     EVRFlag(..),
     EVROf(..),
-    RPM,
+    RPM(..),
     pattern NEVR,
     pattern N,
 ) where
@@ -50,8 +50,8 @@ type family EVROf (f :: EVRFlag) where
     EVROf 'NoEVR   = ()
 
 data RPM (h :: EVRFlag) = RPM {
-    name :: !Name,
-    evr  :: !(EVROf h)
+    _name :: !Name,
+    _evr  :: !(EVROf h)
 }
 
 ---------------------------------------------------
