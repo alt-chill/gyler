@@ -12,13 +12,16 @@ module Gyler.Parsers (
     nonEmptyText,
 
     latinAlpha,
-    latinAlphaNum
+    latinAlphaNum,
+
+    require,
+    requireRight
 ) where
 
 import Data.Text (Text)
 import Data.Void (Void)
 
-import qualified Data.Text as T (pack)
+import qualified Data.Text as T (pack, unpack)
 
 import Text.Megaparsec (Parsec, satisfy, some, (<|>), empty, parse, eof, errorBundlePretty)
 import Text.Megaparsec.Char (space1, alphaNumChar, markChar, digitChar)
@@ -61,3 +64,11 @@ latinAlpha = let isLatinAlpha c = isAsciiLower c || isAsciiUpper c
 
 latinAlphaNum :: Parser Char
 latinAlphaNum = latinAlpha <|> digitChar
+
+-- | Fails if 'Nothing' with the given error message.
+require :: MonadFail m => String -> Maybe a -> m a
+require msg = maybe (fail msg) pure
+
+-- | Fails if the given 'Either' is 'Left'.
+requireRight :: MonadFail m => Either Text a -> m a
+requireRight = either (fail . T.unpack) pure
