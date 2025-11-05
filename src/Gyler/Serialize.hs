@@ -17,7 +17,7 @@ module Gyler.Serialize (
 -- This module is based on `Data.Serialize` from the `cereal` package.
 --
 -- The main difference is that each instance of `IDSerializer` is required
--- to include a unique `Word16` identifier at the beginning of its binary representation.
+-- to include a unique identifier at the beginning of its binary representation.
 --
 -- Instances of `IDSerializer` can only be created using Template Haskell macros.
 -- These macros generate both `IDSerializer` and `Serialize` instances for the specified type.
@@ -31,14 +31,33 @@ module Gyler.Serialize (
 --
 -- Example:
 --      data MyType = MyType Int String deriving (Generic)
---      $(deriveIDSerializable ''MyType)
+--      $(deriveIDSerializable [t| MyType |])
+--
+--      $(deriveIDSerializableWith
+--          [|
+--             \(SomeSubtask x) -> do
+--                 put (subtaskType x)
+--                 put x
+--          |]
+--
+--
+--          [| do
+--             t <- get :: Get SubtaskType
+--             case t of
+--                 Gear -> fmap SomeSubtask (get :: Get (Subtask 'Gear))
+--                 SRPM -> fmap SomeSubtask (get :: Get (Subtask 'SRPM))
+--                 Del  -> fmap SomeSubtask (get :: Get (Subtask 'Del))
+--          |]
+--
+--          [t| SomeSubtask |]
+--       )
+--
 
-import Gyler.Serialize.UniqID (HasUniqID(..), deriveUniqID)
+import Gyler.Serialize.UniqID (UniqID, HasUniqID(..), deriveUniqID)
 
 import Language.Haskell.TH (TypeQ, Q, Dec, ExpQ)
 import Language.Haskell.TH.Syntax
 
-import Data.Word (Word16)
 import Data.Proxy (Proxy(..))
 import Data.Serialize (Serialize(..), Get, Putter, GSerializePut(..), GSerializeGet(..))
 
@@ -71,7 +90,7 @@ putWithID x = put (uniqID (Proxy @t)) >> put' x
 
 getWithID :: forall t. IDSerializer t => Get t
 getWithID = do
-    n <- get :: Get Word16
+    n <- get :: Get UniqID
     if n == uniqID (Proxy @t)
         then get'
         else fail $ "UniqID mismatch: expected " ++ show (uniqID (Proxy @t)) ++ ", got " ++ show n
@@ -103,7 +122,7 @@ deriveIDSerializerWith putExp getExp tQ = [d|
   |]
 
 ------------------------------------------------------------
--- Combined derivation (ID + UniqID)
+-- Combined derivation (UniqID + Serialize)
 ------------------------------------------------------------
 
 deriveIDSerializable :: TypeQ -> Q [Dec]

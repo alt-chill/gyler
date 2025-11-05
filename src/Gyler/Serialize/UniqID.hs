@@ -1,6 +1,10 @@
 {-# LANGUAGE TemplateHaskellQuotes #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveLift #-}
 
 module Gyler.Serialize.UniqID (
+    UniqID,
     HasUniqID (..),
     deriveUniqID
 ) where
@@ -18,21 +22,28 @@ module Gyler.Serialize.UniqID (
 -- Therefore, these IDs are sufficiently unique for serialization purposes.
 
 import Language.Haskell.TH (TypeQ, Q, Dec, Exp, pprint)
+import Language.Haskell.TH.Syntax (Lift)
 
-import Data.Word (Word16)
 import Data.Hashable (hashWithSalt)
 import Data.Proxy (Proxy)
+import Data.Serialize (Serialize)
+import Data.Word (Word16)
 
 -- This class is *not exported*. It prevents users from creating
 -- their own HasUniqID instances outside this module.
 class SealedUniqID t
+
+-- Centralized hash type definition
+newtype UniqID = UniqID Word16
+  deriving (Eq, Ord, Show, Lift)
+  deriving newtype (Enum, Num, Serialize)
 
 ------------------------------------------------------------
 -- Public class
 ------------------------------------------------------------
 
 class SealedUniqID t => HasUniqID t where
-    uniqID :: Proxy t -> Word16
+    uniqID :: Proxy t -> UniqID
 
 ------------------------------------------------------------
 -- Deterministic uniqID generator
@@ -42,7 +53,7 @@ genDeterministicID :: TypeQ -> Q Exp
 genDeterministicID tQ = do
     ty <- tQ
     let str = pprint ty
-        h   = (fromIntegral . hashWithSalt 42) str :: Word16
+        h   = (fromIntegral . hashWithSalt 42) str :: UniqID
     [| h |]
 
 ------------------------------------------------------------
