@@ -10,10 +10,7 @@ import Gyler.Domain.RPM.Name
 import Gyler.Classes.IsText (toText)
 import Data.Either (isRight, isLeft)
 
-import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
-
-import Gyler.Arbitraries ()
 
 validChars :: [Char]
 validChars = ['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "-._+"
@@ -58,5 +55,3 @@ spec = parallel $ describe "Name" $ do
             case mkName txt of
               Right v -> mkName (toText v) == Right v
               Left  _ -> False
-
-        mkSerializeTest (Proxy :: Proxy Name)

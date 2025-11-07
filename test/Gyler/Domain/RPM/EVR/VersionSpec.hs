@@ -10,7 +10,6 @@ import Gyler.Domain.RPM.EVR.Version
 import Gyler.Classes.IsText (toText)
 import Data.Either (isRight, isLeft)
 
-import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
 
 validVersionChar :: Gen Char
@@ -54,6 +53,3 @@ spec = parallel $ describe "Version" $ do
             case mkVersion txt of
               Right v -> mkVersion (toText v) == Right v
               Left  _ -> False
-
-
-        mkSerializeTest (Proxy :: Proxy Version)

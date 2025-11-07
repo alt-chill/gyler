@@ -8,6 +8,7 @@ import qualified Gyler.Data.NonEmptyTextSpec
 import qualified Gyler.Data.ValidContainer.HashSetSpec
 
 import qualified Gyler.LoggingSpec
+import qualified Gyler.SerializeSpec
 
 import qualified Gyler.Domain.RPMSpec
 
@@ -47,6 +48,7 @@ main = hspec $ do
   mkRuntimeValidatedTest (Proxy :: Proxy State)
 
   Gyler.LoggingSpec.spec
+  Gyler.SerializeSpec.spec
 
   beforeAll (newIORef Map.empty) $ do
     mkFetchSpecTest MaintainersQuery

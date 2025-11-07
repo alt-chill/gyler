@@ -12,7 +12,6 @@ import Numeric.Natural (Natural)
 
 import Gyler.Domain.RPM.EVR.Epoch
 
-import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
 
 -- | Property: mkEpoch (show n <> ":") == Right (Epoch n)
@@ -56,5 +55,3 @@ spec = describe "Epoch" $ do
 
     it "returns Left when colon is missing" $
       property prop_mkEpoch_missing_colon
-
-    mkSerializeTest (Proxy :: Proxy Epoch)

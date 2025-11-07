@@ -14,7 +14,6 @@ import Gyler.Domain.RPM
 import Test.Hspec
 import Test.QuickCheck
 
-import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
 
 import Gyler.Arbitraries ()
@@ -24,6 +23,3 @@ spec = describe "RPM" $ do
     EVR.spec
     Name.spec
     VerCmp.spec
-
-    mkSerializeTest (Proxy :: Proxy (RPM 'WithEVR))
-    mkSerializeTest (Proxy :: Proxy (RPM 'NoEVR))

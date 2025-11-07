@@ -21,7 +21,6 @@ import Gyler.Domain.RPM.EVR.Release (mkRelease)
 import Gyler.Classes.Renderable (Renderable(..))
 import Gyler.Classes.IsText (toText)
 
-import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
 
 -- | Generate valid EVR strings such as "1:1.2.3-4", "0.1-rc1", "1.0.0-1"
@@ -72,5 +71,3 @@ evrSpec = parallel $ do
             case mkEvr txt of
               Right evr -> mkEvr (render evr) == Right evr
               Left  _   -> False
-
-        mkSerializeTest (Proxy :: Proxy EVR)

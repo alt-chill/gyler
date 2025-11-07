@@ -10,7 +10,6 @@ import Gyler.Domain.RPM.EVR.Release
 import Gyler.Classes.IsText (toText)
 import Data.Either (isRight, isLeft)
 
-import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
 
 validReleaseChar :: Gen Char
@@ -54,5 +53,3 @@ spec = parallel $ describe "Release" $ do
             case mkRelease txt of
               Right v -> mkRelease (toText v) == Right v
               Left  _ -> False
-
-        mkSerializeTest (Proxy :: Proxy Release)
