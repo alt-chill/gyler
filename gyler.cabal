@@ -132,12 +132,18 @@ test-suite gyler-tests
 
                        Gyler.Arbitraries
                        Gyler.Arbitraries.Domain
+
                        Gyler.Arbitraries.Domain.RPM
                        Gyler.Arbitraries.Domain.RPM.Name
                        Gyler.Arbitraries.Domain.RPM.EVR.Version
                        Gyler.Arbitraries.Domain.RPM.EVR.Release
                        Gyler.Arbitraries.Domain.RPM.EVR.Epoch
                        Gyler.Arbitraries.Domain.RPM.EVR
+
+                       Gyler.Arbitraries.Domain.Subtask
+                       Gyler.Arbitraries.Domain.Subtask.Type
+
+                       Gyler.Domain.SubtaskSpec
 
                        TestUtils
 

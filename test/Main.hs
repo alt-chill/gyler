@@ -11,6 +11,7 @@ import qualified Gyler.LoggingSpec
 import qualified Gyler.SerializeSpec
 
 import qualified Gyler.Domain.RPMSpec
+import qualified Gyler.Domain.SubtaskSpec
 
 import Gyler.Data.NonEmptyText.Arbitrary ()
 
@@ -57,3 +58,4 @@ main = hspec $ do
     mkFetchSpecTest StatesQuery
 
   Gyler.Domain.RPMSpec.spec
+  Gyler.Domain.SubtaskSpec.spec
