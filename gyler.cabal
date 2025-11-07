@@ -25,6 +25,9 @@ library
                       ,Gyler.Domain.PushableBranch
                       ,Gyler.Domain.State
 
+                      ,Gyler.Domain.Subtask.Type
+                      ,Gyler.Domain.Subtask
+
                       ,Gyler.Domain.RPM
                       ,Gyler.Domain.RPM.VerCmp
                       ,Gyler.Domain.RPM.Symbols
