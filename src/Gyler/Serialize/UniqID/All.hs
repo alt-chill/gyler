@@ -8,20 +8,26 @@ module Gyler.Serialize.UniqID.All (allUniqIDTypes) where
 import Language.Haskell.TH (TypeQ)
 
 import Gyler.Domain.RPM
-import Gyler.Domain.RPM.Name
 import Gyler.Domain.RPM.EVR
-import Gyler.Domain.RPM.EVR.Version
-import Gyler.Domain.RPM.EVR.Release
 import Gyler.Domain.RPM.EVR.Epoch
+import Gyler.Domain.RPM.EVR.Release
+import Gyler.Domain.RPM.EVR.Version
+import Gyler.Domain.RPM.Name
+import Gyler.Domain.Subtask
+import Gyler.Domain.Subtask.Type
 
 allUniqIDTypes :: [TypeQ]
 allUniqIDTypes =
-    [t| RPM 'WithEVR |] :
-    [t| RPM 'NoEVR   |] :
-    [t| Name |] :
-    [t| EVR |] :
-    [t| Version |] :
-    [t| Release |] :
     [t| Epoch |] :
+    [t| EVR |] :
+    [t| Name |] :
+    [t| Release |] :
+    [t| RPM 'NoEVR   |] :
+    [t| RPM 'WithEVR |] :
+    [t| SomeSubtask |] :
+    [t| Subtask 'Del  |] :
+    [t| Subtask 'Gear |] :
+    [t| Subtask 'SRPM |] :
+    [t| SubtaskType |] :
+    [t| Version |] :
     []
-
