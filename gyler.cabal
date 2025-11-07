@@ -75,6 +75,7 @@ library
 
                       ,Gyler.Serialize
                       ,Gyler.Serialize.UniqID
+                      ,Gyler.Serialize.UniqID.All
                       ,Gyler.Serialize.Text
 
   hs-source-dirs:      src
