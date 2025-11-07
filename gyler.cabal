@@ -142,6 +142,8 @@ test-suite gyler-tests
 
                        TestUtils.RuntimeValidated.Template
 
+                       TestUtils.Serialize.Template
+
   build-depends:      ,base >=4.7 && <5
                       ,gyler
                       ,hspec
