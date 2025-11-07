@@ -63,7 +63,7 @@ EOF
 
 main() {
     if [[ $# -eq 0 ]]; then
-        print_error "Usage: $SCRIPT_NAME [--stdout|--to-files]"
+        print_error "Usage: $SCRIPT_NAME [--stdout|--to-file]"
         exit 1
     fi
 
