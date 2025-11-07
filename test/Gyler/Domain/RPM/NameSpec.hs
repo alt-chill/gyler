@@ -13,6 +13,8 @@ import Data.Either (isRight, isLeft)
 import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
 
+import Gyler.Arbitraries ()
+
 validChars :: [Char]
 validChars = ['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "-._+"
 
@@ -21,12 +23,6 @@ validNameChar = elements validChars
 
 genValidNameText :: Gen T.Text
 genValidNameText = T.pack <$> listOf1 validNameChar
-
-instance Arbitrary Name where
-    arbitrary = right . mkName <$> genValidNameText
-        where
-        right :: Either a b -> b -- partial
-        right (Right x) = x
 
 genInvalidNameText :: Gen T.Text
 genInvalidNameText = T.pack <$> listOf1 (suchThat arbitrary invalidChar)

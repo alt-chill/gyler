@@ -25,9 +25,6 @@ prop_mkEpoch_missing_colon :: Natural -> Bool
 prop_mkEpoch_missing_colon n =
   isLeft $ mkEpoch (pack (show n))
 
-instance Arbitrary Epoch where
-    arbitrary = Epoch <$> arbitrary
-
 spec :: Spec
 spec = describe "Epoch" $ do
   describe "mkEpoch" $ do

@@ -126,6 +126,15 @@ test-suite gyler-tests
                        Gyler.Domain.RPM.EVR.VersionSpec
                        Gyler.Domain.RPM.EVR.ReleaseSpec
 
+                       Gyler.Arbitraries
+                       Gyler.Arbitraries.Domain
+                       Gyler.Arbitraries.Domain.RPM
+                       Gyler.Arbitraries.Domain.RPM.Name
+                       Gyler.Arbitraries.Domain.RPM.EVR.Version
+                       Gyler.Arbitraries.Domain.RPM.EVR.Release
+                       Gyler.Arbitraries.Domain.RPM.EVR.Epoch
+                       Gyler.Arbitraries.Domain.RPM.EVR
+
                        TestUtils
 
                        TestUtils.FetchSpec

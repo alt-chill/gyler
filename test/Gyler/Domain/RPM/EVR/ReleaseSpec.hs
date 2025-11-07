@@ -20,12 +20,6 @@ validReleaseChar = elements $
 genValidReleaseText :: Gen T.Text
 genValidReleaseText = T.pack <$> listOf1 validReleaseChar
 
-instance Arbitrary Release where
-    arbitrary = right . mkRelease <$> genValidReleaseText
-        where
-        right :: Either a b -> b
-        right (Right x) = x
-
 genInvalidReleaseText :: Gen T.Text
 genInvalidReleaseText = T.pack <$> listOf1 (suchThat arbitrary invalidChar)
   where

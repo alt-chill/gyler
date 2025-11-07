@@ -17,11 +17,7 @@ import Test.QuickCheck
 import TestUtils.Serialize.Template (mkSerializeTest)
 import Data.Proxy (Proxy(..))
 
-instance Arbitrary (RPM 'WithEVR) where
-    arbitrary = NEVR <$> arbitrary <*> arbitrary
-
-instance Arbitrary (RPM 'NoEVR) where
-    arbitrary = N <$> arbitrary
+import Gyler.Arbitraries ()
 
 spec :: Spec
 spec = describe "RPM" $ do

@@ -32,12 +32,6 @@ genValidEvrText = do
   r <- listOf1 $ elements (['A'..'Z'] ++ ['a'..'z'] ++ ['0'..'9'] ++ "._+~")
   pure . T.pack $ e <> v <> "-" <> r
 
-instance Arbitrary EVR where
-    arbitrary = right . mkEvr <$> genValidEvrText
-        where
-        right :: Either a b -> b -- partial
-        right (Right x) = x
-
 spec :: Spec
 spec = parallel $ describe "EVR" $ do
     Epoch.spec

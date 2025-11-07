@@ -20,12 +20,6 @@ validVersionChar = elements $
 genValidVersionText :: Gen T.Text
 genValidVersionText = T.pack <$> listOf1 validVersionChar
 
-instance Arbitrary Version where
-    arbitrary = right . mkVersion <$> genValidVersionText
-        where
-        right :: Either a b -> b -- partial
-        right (Right x) = x
-
 genInvalidVersionText :: Gen T.Text
 genInvalidVersionText = T.pack <$> listOf1 (suchThat arbitrary invalidChar)
   where
