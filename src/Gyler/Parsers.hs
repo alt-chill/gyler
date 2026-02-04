@@ -3,7 +3,8 @@
 -- Description: basic parsers combinators, built on top of `Megaparsec`
 
 module Gyler.Parsers (
-    Parser(..),
+    module Gyler.Parsers.Type,
+
     useParser,
     lexeme,
     symbol,
@@ -20,18 +21,17 @@ module Gyler.Parsers (
 ) where
 
 import Data.Text (Text)
-import Data.Void (Void)
 
 import qualified Data.Text as T (pack, unpack)
 
-import Text.Megaparsec (Parsec, satisfy, some, (<|>), empty, parse, eof, errorBundlePretty)
+import Text.Megaparsec (satisfy, some, (<|>), empty, parse, eof, errorBundlePretty)
 import Text.Megaparsec.Char (space1, alphaNumChar, markChar, digitChar, string)
 import qualified Text.Megaparsec.Char.Lexer as L (lexeme, symbol, space)
 
 import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
 import Data.Char (isAsciiLower, isAsciiUpper)
 
-type Parser = Parsec Void Text
+import Gyler.Parsers.Type (Parser(..))
 
 spaceConsumer :: Parser ()
 spaceConsumer = L.space space1 empty empty

@@ -48,6 +48,7 @@ library
                       ,Gyler.Utils.Maybe
 
                       ,Gyler.Parsers
+                      ,Gyler.Parsers.Type
 
                       ,Gyler.GylerM
                       ,Gyler.GirarEnv
