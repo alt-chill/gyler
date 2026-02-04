@@ -12,5 +12,6 @@ module Gyler.Data.ValidContainer (
 import Data.Hashable (Hashable)
 
 class ValidContainer c where
-  vcMember :: (Eq a, Hashable a) => a -> c a -> Bool
+  vcMember   :: (Eq a, Hashable a) => a -> c a -> Bool
   vcFromList :: (Eq a, Hashable a) => [a] -> c a
+  vcToList   :: c a -> [a]

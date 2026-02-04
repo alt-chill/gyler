@@ -14,9 +14,10 @@ import Data.Serialize (Serialize (..))
 import Data.Hashable (Hashable)
 
 instance ValidContainer HashSet where
-  vcMember = member
+  vcMember   = member
   vcFromList = fromList
+  vcToList   = toList
 
 instance (Serialize a, Eq a, Hashable a) => Serialize (HashSet a) where
-    put = put . toList
-    get = fromList <$> get
+    put = put . vcToList
+    get = vcFromList <$> get
