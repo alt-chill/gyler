@@ -26,7 +26,8 @@ module Gyler.Classes.RuntimeValidated (
 -- ```
 --
 -- For instance implementations, the Gyler.Classes.RuntimeValidated.Internal
--- module should be used. The constructor used for mkUnsafe should not be exported.
+-- module should be used. The data constructor should not be exported (keep it
+-- module-private). mkUnsafe may use it internally.
 --
 -- When creating a new RuntimeValidated value, the proper approach is to use the
 -- mkValidated function. A set of reference values should be created with mkValidSet.

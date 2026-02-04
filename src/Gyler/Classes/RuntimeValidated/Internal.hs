@@ -8,6 +8,7 @@ module Gyler.Classes.RuntimeValidated.Internal (
 
 import Data.Kind (Type)
 import Data.Hashable (Hashable)
+
 import Gyler.Data.ValidContainer (ValidContainer, vcMember, vcFromList)
 
 -- Eq and Hashable constraints enable usage with unordered-containers
@@ -20,7 +21,7 @@ class (Eq a, Hashable a) => RuntimeValidated a where
 -- Checks if the candidate value (built from the raw value) exists in the reference container
 -- Returns `Just a` if found, otherwise `Nothing`
 mkValidated
-  :: (RuntimeValidated a, ValidContainer c, Eq a, Hashable a)
+  :: (RuntimeValidated a, ValidContainer c)
   => c a -> Raw a -> Maybe a
 mkValidated container raw =
   let candidate = mkUnsafe raw
@@ -31,7 +32,7 @@ mkValidated container raw =
 -- Creates a container of reference values from a list of raw values
 -- Uses the unsafe constructor (mkUnsafe) since raw values are assumed to be valid
 mkValidSet
-  :: (RuntimeValidated a, ValidContainer c, Eq a, Hashable a)
+  :: (RuntimeValidated a, ValidContainer c)
   => [Raw a]
   -> c a
 mkValidSet raws =
