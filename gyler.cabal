@@ -64,6 +64,9 @@ library
 
                       ,Gyler.Classes.RuntimeValidated
                       ,Gyler.Classes.RuntimeValidated.Internal
+                      ,Gyler.Classes.RuntimeValidated.Environment
+                      ,Gyler.Classes.RuntimeValidated.Parser
+                      ,Gyler.Classes.RuntimeValidated.Parser.Raw
 
                       ,Gyler.Classes.Renderable
 
