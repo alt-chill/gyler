@@ -1,28 +1,13 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Gyler.Domain.Branch (
     Branch,
     BranchesSet
 ) where
 
-import Gyler.Data.NonEmptyText (NonEmptyText)
+import Gyler.Domain.RuntimeValidated.Template (mkRvNonEmptyText)
 
-import Gyler.Classes.RuntimeValidated.Internal (RuntimeValidated(..))
-
-import Data.Hashable (Hashable)
-import Gyler.Data.ValidContainer.HashSet (HashSet)
-
-import Data.Serialize (Serialize)
-
-newtype Branch = Branch NonEmptyText
-                     deriving Show
-                     deriving newtype (Eq, Hashable, Serialize)
-
-instance RuntimeValidated Branch where
-    type Raw Branch = NonEmptyText
-    mkUnsafe = Branch
-    getRaw (Branch x) = x
-
-type BranchesSet = HashSet Branch
+$(mkRvNonEmptyText "Branch" "BranchesSet")
