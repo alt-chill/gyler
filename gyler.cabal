@@ -29,6 +29,8 @@ library
                       ,Gyler.Domain.Subtask.Type
                       ,Gyler.Domain.Subtask
 
+                      ,Gyler.Domain.Task
+
                       ,Gyler.Domain.RPM
                       ,Gyler.Domain.RPM.VerCmp
                       ,Gyler.Domain.RPM.Symbols
