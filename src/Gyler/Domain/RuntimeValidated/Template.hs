@@ -28,6 +28,9 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 import Gyler.Classes.RuntimeValidated.Internal (RuntimeValidated(..))
 import Gyler.Classes.RuntimeValidated.Parser.Raw (HasParsableRaw(..))
 
+import Gyler.Classes.IsNonEmptyText (IsNonEmptyText(..))
+import Gyler.Classes.IsText         (IsText(..))
+
 import Gyler.Data.ValidContainer.HashSet (HashSet)
 
 import Gyler.Parsers (nonEmptyText, latinAlphaNum)
@@ -60,6 +63,12 @@ mkRvNonEmptyText typeNameStr setNameStr =
 
         instance HasParsableRaw RV_TYPE where
             rawParser _ = nonEmptyText (T.pack <$> some (latinAlphaNum <|> oneOf rpmChars))
+
+        instance IsText RV_TYPE where
+            toText (RV_TYPE x) = toText x
+
+        instance IsNonEmptyText RV_TYPE where
+            toNonEmptyText (RV_TYPE x) = x
         |]
 
   in renameByBase "RV_TYPE" tyName . renameByBase "RV_SET" setName <$> decs
