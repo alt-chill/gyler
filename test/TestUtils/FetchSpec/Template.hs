@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
 
 module TestUtils.FetchSpec.Template (mkFetchSpecTest) where
 
@@ -19,11 +21,13 @@ import Control.Monad.IO.Class (liftIO)
 
 import Control.Monad (when)
 
-mkFetchSpecTest :: forall e. (FetchSpec e, Show e) => e -> SpecWith (IORef (Map.Map FilePath String))
-mkFetchSpecTest query = describe ("Gyler.FetchSpec." <> show query) $ do
+import Type.Reflection (Typeable, typeRep)
+
+mkFetchSpecTest :: forall e. (FetchSpec e, Typeable e) => e -> SpecWith (IORef (Map.Map FilePath String))
+mkFetchSpecTest query = describe ("Gyler.FetchSpec." <> typeName) $ do
     describe "parseValue" $ do
         it "matches golden output" $ \_ -> do
-            let storeDir = joinPath ["test", "golden", "FetchSpec", show query]
+            let storeDir = joinPath ["test", "golden", "FetchSpec", typeName]
 
                 inputFile  = storeDir </> "input.txt"
                 outputFile = storeDir </> "output.dat"
@@ -38,7 +42,7 @@ mkFetchSpecTest query = describe ("Gyler.FetchSpec." <> show query) $ do
                 Right expected' -> parsed `shouldBe` expected'
 
         it "is Serialize roundtrippable" $ \_ -> do
-            let storeDir = joinPath ["test", "golden", "FetchSpec", show query]
+            let storeDir = joinPath ["test", "golden", "FetchSpec", typeName]
                 inputFile  = storeDir </> "input.txt"
 
             input <- BS.readFile inputFile
@@ -57,7 +61,7 @@ mkFetchSpecTest query = describe ("Gyler.FetchSpec." <> show query) $ do
 
             case Map.lookup fname seen of
                 Just spec -> expectationFailure $ fname <> " cacheFileName is already used in " <> spec
-                Nothing   -> liftIO $ modifyIORef' seenFilesRef (Map.insert fname (show query))
+                Nothing   -> liftIO $ modifyIORef' seenFilesRef (Map.insert fname typeName)
 
         it "is not empty" $ \_ -> fname `shouldNotBe` ""
 
@@ -67,3 +71,6 @@ mkFetchSpecTest query = describe ("Gyler.FetchSpec." <> show query) $ do
         let staleTime = staleAfter query
 
         it "is positive" $ \_ -> staleTime `shouldSatisfy` (>0)
+
+    where
+        typeName = show (typeRep @e)
