@@ -15,6 +15,7 @@ import Gyler.Domain.RPM.EVR.Version
 import Gyler.Domain.RPM.Name
 import Gyler.Domain.Subtask
 import Gyler.Domain.Subtask.Type
+import Gyler.Domain.Task
 
 allUniqIDTypes :: [TypeQ]
 allUniqIDTypes =
@@ -29,5 +30,6 @@ allUniqIDTypes =
     [t| Subtask 'Gear |] :
     [t| Subtask 'SRPM |] :
     [t| SubtaskType |] :
+    [t| Task 'IDOnly |] :
     [t| Version |] :
     []
