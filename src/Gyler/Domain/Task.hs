@@ -32,7 +32,7 @@ import GHC.Natural (Natural)
 data TaskView = IDOnly
 --              | Regular
 --              | Full
-              deriving (Show, Eq, Generic)
+              deriving (Show, Eq, Enum, Bounded, Generic)
 
 instance Hashable  TaskView
 instance Serialize TaskView

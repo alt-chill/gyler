@@ -154,6 +154,8 @@ test-suite gyler-tests
                        Gyler.Arbitraries.Domain.Subtask
                        Gyler.Arbitraries.Domain.Subtask.Type
 
+                       Gyler.Arbitraries.Domain.Task
+
                        Gyler.Domain.SubtaskSpec
 
                        TestUtils
