@@ -46,6 +46,8 @@ library
                       ,Gyler.FetchSpec.PushableBranchesQuery
                       ,Gyler.FetchSpec.StatesQuery
 
+                      ,Gyler.FetchSpec.TaskIDsQuery
+
                       ,Gyler.Utils.List
                       ,Gyler.Utils.Errors
                       ,Gyler.Utils.Maybe
