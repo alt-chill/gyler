@@ -32,6 +32,7 @@ data GirarCommand
     = ViaGyle     { gyleArgs    :: ![NonEmptyText] }
     | ViaGitery   { giteryArgs  :: ![NonEmptyText]}
     | ViaGirarWeb { endpoint    :: !NonEmptyText }
+    deriving (Show, Eq)
 
 -- | Used for logging on errors (constructor only).
 typeName :: GirarCommand -> Text
