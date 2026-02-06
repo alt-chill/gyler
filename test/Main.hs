@@ -1,3 +1,5 @@
+{-# LANGUAGE QuasiQuotes #-}
+
 import Test.Hspec
 
 import qualified Gyler.CachedFileSpec
@@ -29,10 +31,16 @@ import Gyler.FetchSpec.BranchesQuery         (BranchesQuery(..))
 import Gyler.FetchSpec.PushableBranchesQuery (PushableBranchesQuery(..))
 import Gyler.FetchSpec.StatesQuery           (StatesQuery(..))
 
+import Gyler.FetchSpec.TaskIDsQuery          (TaskIDsQuery(..))
+
 import Data.IORef
 import qualified Data.Map as Map
 
 import Data.Proxy (Proxy(..))
+
+import Gyler.Data.NonEmptyText.QQ (net)
+
+import Gyler.Classes.RuntimeValidated.Internal (mkUnsafe)
 
 main :: IO ()
 main = hspec $ do
@@ -56,6 +64,7 @@ main = hspec $ do
     mkFetchSpecTest BranchesQuery
     mkFetchSpecTest PushableBranchesQuery
     mkFetchSpecTest StatesQuery
+    mkFetchSpecTest $ TaskIDsQuery (mkUnsafe [net|test|]) [] []
 
   Gyler.Domain.RPMSpec.spec
   Gyler.Domain.SubtaskSpec.spec
