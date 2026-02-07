@@ -29,13 +29,20 @@ import TestUtils.Serialize.Template (mkSerializeTest)
 import Gyler.Arbitraries ()
 import Gyler.Serialize.UniqID.All (allUniqIDTypes)
 
+import Gyler.Serialize.UniqID (UniqID)
+
 import Language.Haskell.TH
 
 import Data.Proxy (Proxy(..))
 
+import Data.Proxy (Proxy(..))
+import Data.IORef (newIORef)
+import qualified Data.Map as Map
+
 spec :: Spec
-spec = describe "Serialize instances" $ parallel $ do
-  $(do
-      doE [ noBindS [| mkSerializeTest (Proxy :: Proxy $t) |]
-          | t <- allUniqIDTypes
-          ])
+spec = beforeAll (newIORef Map.empty) $
+    describe "Serialize instances"  $ do
+        $(do
+            doE [ noBindS [| mkSerializeTest (Proxy :: Proxy $t) |]
+                | t <- allUniqIDTypes
+                ])
