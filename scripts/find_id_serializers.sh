@@ -39,6 +39,7 @@ find_id_macros() {
         deriveIDSerializerWith
         deriveIDSerializable
         deriveIDSerializableWith
+        mkRvNonEmptyText
     )
 
     local script_dir
@@ -50,9 +51,23 @@ find_id_macros() {
 }
 
 extract_type_signatures() {
-    # Extract type quotations of the form [t| ... |]
-    # from the given input (likely TH splice code).
-    grep -Poz '\[t\|(.|\n)*?\|\]' | tr '\0' '\n'
+    # Extract type quotations.
+    #
+    # 1. Standard form: [t| ... |]
+    #    Used by deriveIDSerializable, etc.
+    #
+    # 2. RuntimeValidated form: mkRvNonEmptyText "TypeName" "SetName"
+    #    We parse the first quoted string and wrap it in [t| ... |]
+
+    perl -0777 -ne '
+        while ( /\[t\|.*?\|\]/gs ) {
+            print "$&\n";
+        }
+
+        while ( /mkRvNonEmptyText\s+"([^"]+)"/g ) {
+            print "[t| $1 |]\n";
+        }
+    '
 }
 
 convert_paths_to_modules() {
