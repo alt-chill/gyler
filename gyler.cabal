@@ -156,6 +156,12 @@ test-suite gyler-tests
 
                        Gyler.Arbitraries.Domain.Task
 
+                       Gyler.Arbitraries.Domain.RuntimeValidated
+                       Gyler.Arbitraries.Domain.RuntimeValidated.State
+                       Gyler.Arbitraries.Domain.RuntimeValidated.Branch
+                       Gyler.Arbitraries.Domain.RuntimeValidated.Maintainer
+                       Gyler.Arbitraries.Domain.RuntimeValidated.PushableBranch
+
                        Gyler.Domain.SubtaskSpec
 
                        TestUtils
@@ -164,6 +170,7 @@ test-suite gyler-tests
                        TestUtils.FetchSpec.Template
 
                        TestUtils.RuntimeValidated.Template
+                       TestUtils.RuntimeValidated.Arbitrary
 
                        TestUtils.Serialize.Template
 
