@@ -18,7 +18,7 @@ import Gyler.Domain.Branch     (Branch)
 
 import Gyler.Domain.Task (Task(..), TaskView(IDOnly), pattern IDOnlyTask)
 
-import Gyler.Data.NonEmptyText        (NonEmptyText)
+import Gyler.Data.NonEmptyText        (NonEmptyText, unpack)
 import Gyler.Data.NonEmptyText.QQ     (net)
 
 import Gyler.Classes.IsNonEmptyText (IsNonEmptyText(..))
@@ -78,7 +78,8 @@ instance FetchSpec TaskIDsQuery where
     command query = ViaGyle (argsOf query)
 
     -- Use a hash to store queries with different targets in separate files
-    cacheFileName query = "task_ids_" <> showHex (fromIntegral $ hashWithSalt 42 query :: Word) ""
+    cacheFileName query = "task_ids_" <> (unpack . toNonEmptyText . targetMaintainer $ query) <> "_"
+                                      <> showHex (fromIntegral $ hashWithSalt 42 query :: Word) ""
 
     staleAfter _ = 120
 
