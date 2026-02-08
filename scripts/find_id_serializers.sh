@@ -51,22 +51,49 @@ find_id_macros() {
 }
 
 extract_type_signatures() {
-    # Extract type quotations.
-    #
-    # 1. Standard form: [t| ... |]
-    #    Used by deriveIDSerializable, etc.
-    #
-    # 2. RuntimeValidated form: mkRvNonEmptyText "TypeName" "SetName"
-    #    We parse the first quoted string and wrap it in [t| ... |]
+    # This Perl script processes lines in the format: "src/Path/File.hs <TAB> $(macro ...)"
+    # It converts paths to module names and qualifies the types found inside.
+    perl -ne '
+        use strict;
+        use warnings;
 
-    perl -0777 -ne '
-        while ( /\[t\|.*?\|\]/gs ) {
-            print "$&\n";
+        chomp;
+        my ($file, $macro) = split(/\t/, $_, 2);
+        next unless $file && $macro;
+
+        # 1. Convert File path to Module Name
+        #    e.g., src/Gyler/Domain/Subtask.hs -> Gyler.Domain.Subtask
+        my $module = $file;
+        $module =~ s/^src\///;
+        $module =~ s/\.hs$//;
+        $module =~ s/\//./g;
+
+        # 2. Extract the content inside the type quasiquoter or special functions
+        my $type_content = "";
+
+        if ($macro =~ /\[t\|(.*?)\|\]/) {
+            $type_content = $1;
+        }
+        elsif ($macro =~ /mkRvNonEmptyText\s+"([^"]+)"/) {
+            $type_content = $1;
         }
 
-        while ( /mkRvNonEmptyText\s+"([^"]+)"/g ) {
-            print "[t| $1 |]\n";
-        }
+        next if $type_content eq "";
+
+        # 3. Qualify the types
+        #    Regex explanation:
+        #    (?<!\.)       : Lookbehind, ensure no dot precedes the match (not already qualified)
+        #    \b            : Word boundary
+        #    ([A-Z]\w*)    : Capture a word starting with Uppercase (Type or Constructor)
+
+        # We replace "Type" with "Module.Type"
+        $type_content =~ s/(?<!\.)\b([A-Z]\w*)/$module.$1/g;
+
+        # Clean up extra spaces
+        $type_content =~ s/\s+/ /g;
+        $type_content =~ s/^\s+|\s+$//g;
+
+        print "[t| $type_content |]\n";
     '
 }
 

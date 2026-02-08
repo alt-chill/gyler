@@ -36,7 +36,7 @@ uniqIDAll() {
     esac
 
     imports="$("$script_dir"/find_id_serializers.sh --modules \
-        | sed 's|^|import |g')"
+        | sed 's|^|import qualified |g')"
 
     types="$("$script_dir"/find_id_serializers.sh --types \
         | sed 's|$| :|g'     \

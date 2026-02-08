@@ -90,6 +90,10 @@ foreach my $file (@files) {
         # Print each macro found, prefixed by the file name for clarity
         foreach my $m (@found) {
             print "$m\n\n";
+            # Output format: filename <TAB> macro_content
+            # We strip newlines from the macro to make it a single line for easier processing
+            $m =~ s/\n/ /g;
+            print "$file\t$m\n";
         }
     }
 }
