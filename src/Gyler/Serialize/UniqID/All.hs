@@ -7,37 +7,37 @@ module Gyler.Serialize.UniqID.All (allUniqIDTypes) where
 
 import Language.Haskell.TH (TypeQ)
 
-import Gyler.Domain.Branch
-import Gyler.Domain.Maintainer
-import Gyler.Domain.PushableBranch
-import Gyler.Domain.RPM
-import Gyler.Domain.RPM.EVR
-import Gyler.Domain.RPM.EVR.Epoch
-import Gyler.Domain.RPM.EVR.Release
-import Gyler.Domain.RPM.EVR.Version
-import Gyler.Domain.RPM.Name
-import Gyler.Domain.State
-import Gyler.Domain.Subtask
-import Gyler.Domain.Subtask.Type
-import Gyler.Domain.Task
+import qualified Gyler.Domain.Branch
+import qualified Gyler.Domain.Maintainer
+import qualified Gyler.Domain.PushableBranch
+import qualified Gyler.Domain.RPM
+import qualified Gyler.Domain.RPM.EVR
+import qualified Gyler.Domain.RPM.EVR.Epoch
+import qualified Gyler.Domain.RPM.EVR.Release
+import qualified Gyler.Domain.RPM.EVR.Version
+import qualified Gyler.Domain.RPM.Name
+import qualified Gyler.Domain.State
+import qualified Gyler.Domain.Subtask
+import qualified Gyler.Domain.Subtask.Type
+import qualified Gyler.Domain.Task
 
 allUniqIDTypes :: [TypeQ]
 allUniqIDTypes =
-    [t| Branch |] :
-    [t| Epoch |] :
-    [t| EVR |] :
-    [t| Maintainer |] :
-    [t| Name |] :
-    [t| PushableBranch |] :
-    [t| Release |] :
-    [t| RPM 'NoEVR   |] :
-    [t| RPM 'WithEVR |] :
-    [t| SomeSubtask |] :
-    [t| State |] :
-    [t| Subtask 'Del  |] :
-    [t| Subtask 'Gear |] :
-    [t| Subtask 'SRPM |] :
-    [t| SubtaskType |] :
-    [t| Task 'IDOnly |] :
-    [t| Version |] :
+    [t| Gyler.Domain.Branch.Branch |] :
+    [t| Gyler.Domain.Maintainer.Maintainer |] :
+    [t| Gyler.Domain.PushableBranch.PushableBranch |] :
+    [t| Gyler.Domain.RPM.EVR.Epoch.Epoch |] :
+    [t| Gyler.Domain.RPM.EVR.EVR |] :
+    [t| Gyler.Domain.RPM.EVR.Release.Release |] :
+    [t| Gyler.Domain.RPM.EVR.Version.Version |] :
+    [t| Gyler.Domain.RPM.Name.Name |] :
+    [t| Gyler.Domain.RPM.RPM 'Gyler.Domain.RPM.NoEVR |] :
+    [t| Gyler.Domain.RPM.RPM 'Gyler.Domain.RPM.WithEVR |] :
+    [t| Gyler.Domain.State.State |] :
+    [t| Gyler.Domain.Subtask.SomeSubtask |] :
+    [t| Gyler.Domain.Subtask.Subtask 'Gyler.Domain.Subtask.Del |] :
+    [t| Gyler.Domain.Subtask.Subtask 'Gyler.Domain.Subtask.Gear |] :
+    [t| Gyler.Domain.Subtask.Subtask 'Gyler.Domain.Subtask.SRPM |] :
+    [t| Gyler.Domain.Subtask.Type.SubtaskType |] :
+    [t| Gyler.Domain.Task.Task 'Gyler.Domain.Task.IDOnly |] :
     []
