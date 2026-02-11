@@ -50,11 +50,16 @@ import Gyler.Data.NonEmptyText.QQ (net)
 
 import Gyler.Logging (HasLogger(..), LogFunc)
 
+import Gyler.Domain.Maintainer (Maintainer)
+
 data GylerContext = GylerContext
     { _commandsConfig :: !CommandsConfig
     , _girarEnv       :: !(Maybe GirarEnv)
     , _cacheDir       :: !FilePath
-    , _altUser        :: !NonEmptyText
+
+    -- Left NonEmptyText will become Right Maintainer after fetching the valid maintainers set
+    , _altUser        :: !(Either NonEmptyText Maintainer)
+
     , _logger         :: !LogFunc
     }
 
@@ -65,7 +70,7 @@ defContext = GylerContext
     { _commandsConfig = defCommandsConfig
     , _girarEnv = Nothing
     , _cacheDir = "/tmp"
-    , _altUser  = [net|user|]
+    , _altUser  = Left [net|user|]
     , _logger   = \_ _ -> return ()
     }
 
