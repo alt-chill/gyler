@@ -4,7 +4,9 @@
 -- | This module defines the combined configuration for external commands
 -- used by gyler: ssh access for gyle/gitery and curl for external calls.
 
-module Gyler.Context.Commands (
+module Gyler.Profile.Commands (
+    module Gyler.Profile.Commands.Curl,
+    module Gyler.Profile.Commands.Ssh,
     CommandsConfig,
     gyleSsh, giterySsh,
     girarWeb,
@@ -12,8 +14,8 @@ module Gyler.Context.Commands (
 ) where
 
 import Control.Lens (makeLenses)
-import Gyler.Context.Ssh
-import Gyler.Context.Curl
+import Gyler.Profile.Commands.Ssh
+import Gyler.Profile.Commands.Curl
 
 data CommandsConfig = ExternalCommandsConfig
     { _gyleSsh   :: !(Maybe SshConfig)

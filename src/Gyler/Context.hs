@@ -8,7 +8,7 @@
 --
 -- Adding a new context module:
 --
--- 1. Create a new module under @Gyler.Context.<Name>@.
+-- 1. Create a new module under @Gyler.Profile.<Name>@.
 --    The module should define:
 --      - A configuration data type (e.g., @FooConfig@),
 --      - Default value (e.g., @defFooConfig@),
@@ -28,18 +28,14 @@
 -- > import Gyler.Context
 
 module Gyler.Context (
-    module Gyler.Context.Ssh,
-    module Gyler.Context.Curl,
-    module Gyler.Context.Commands,
+    module Gyler.Profile.Commands,
     GylerContext(..),
     defContext,
     commandsConfig, girarEnv, altUser,
     cacheDir, logger
 ) where
 
-import Gyler.Context.Ssh
-import Gyler.Context.Curl
-import Gyler.Context.Commands
+import Gyler.Profile.Commands
 
 import Control.Lens (makeLenses)
 

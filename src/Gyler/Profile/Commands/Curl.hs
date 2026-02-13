@@ -5,7 +5,7 @@
 -- | Configuration for running external CURL commands.
 -- Includes the path to the curl executable and its default arguments.
 
-module Gyler.Context.Curl (
+module Gyler.Profile.Commands.Curl (
     CurlConfig (CurlConfig),
     curlExecutable, curlArgs,
     defCurlConfig

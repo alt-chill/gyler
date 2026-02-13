@@ -60,9 +60,10 @@ library
 
                       ,Gyler.GirarCommand
 
-                      ,Gyler.Context.Ssh
-                      ,Gyler.Context.Curl
-                      ,Gyler.Context.Commands
+                      ,Gyler.Profile.Commands
+                      ,Gyler.Profile.Commands.Ssh
+                      ,Gyler.Profile.Commands.Curl
+
                       ,Gyler.Context
 
                       ,Gyler.Classes.IsText

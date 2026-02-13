@@ -6,7 +6,7 @@
 -- Includes executable path, arguments, remote host, user and optionals port
 -- and authorization key.
 
-module Gyler.Context.Ssh (
+module Gyler.Profile.Commands.Ssh (
     SshConfig (SshConfig),
     sshExecutable, sshArgs, remoteUser,
     remoteHost, remotePort, authKey,
