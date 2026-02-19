@@ -59,7 +59,7 @@ import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
 import Gyler.GylerM (GylerM)
 import Gyler.GirarCommand (GirarCommand, toCmd)
 import Gyler.GirarEnv (GirarEnv)
-import Gyler.Context (girarEnv, commandsConfig, cacheDir)
+import Gyler.Context (girarEnv, profile, commandsConfig, cacheDir)
 
 import Gyler.Utils.Maybe (rightToMaybe)
 import Gyler.Utils.Errors (mkErr)
@@ -137,7 +137,7 @@ prepareCacheFile ent = do
 fetch :: (FetchSpec e, Show e) => e -> GylerM (Maybe (Result e))
 fetch ent = do
     env <- view girarEnv
-    cfg <- view commandsConfig
+    cfg <- view profile
     case toCmd cfg (command ent) of
         Left txt  -> do
             logInfo txt

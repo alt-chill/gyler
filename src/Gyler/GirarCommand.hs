@@ -18,7 +18,8 @@ import Data.Maybe (fromMaybe)
 
 import Gyler.GylerM (GylerM)
 import Gyler.Context (
-    CommandsConfig,
+    CommandsConfig, Profile,
+    commandsConfig,
     giterySsh, gyleSsh, girarWeb,
     sshExecutable, sshArgs, remoteUser,
     remoteHost, remotePort, SshConfig (SshConfig),
@@ -63,8 +64,9 @@ fromCurl (Just (CurlConfig exec args)) =
 fromCurl Nothing = Left "CurlConfig is not available"
 
 -- | Convert a GirarCommand to an executable command using config context.
-toCmd :: CommandsConfig -> GirarCommand -> Either Text Cmd
-toCmd cfg cmd =
+toCmd :: Profile -> GirarCommand -> Either Text Cmd
+toCmd profile cmd =
+    let cfg = profile ^. commandsConfig in
     case getBaseCmd cfg cmd of
         Left err           -> Left $ errMsg err
         Right (exec, args) -> Right (exec, args ++ argsOf cmd)
