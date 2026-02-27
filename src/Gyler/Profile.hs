@@ -3,7 +3,7 @@
 
 module Gyler.Profile (
     module Gyler.Profile.Commands,
-    Profile,
+    Profile(Profile),
     commandsConfig, username,
     defProfile
 ) where

@@ -7,7 +7,7 @@
 module Gyler.Profile.Commands (
     module Gyler.Profile.Commands.Curl,
     module Gyler.Profile.Commands.Ssh,
-    CommandsConfig,
+    CommandsConfig (CommandsConfig),
     gyleSsh, giterySsh,
     girarWeb,
     defCommandsConfig
@@ -17,7 +17,7 @@ import Control.Lens (makeLenses)
 import Gyler.Profile.Commands.Ssh
 import Gyler.Profile.Commands.Curl
 
-data CommandsConfig = ExternalCommandsConfig
+data CommandsConfig = CommandsConfig
     { _gyleSsh   :: !(Maybe SshConfig)
     , _giterySsh :: !(Maybe SshConfig)
     , _girarWeb  :: !(Maybe CurlConfig)
@@ -26,7 +26,7 @@ data CommandsConfig = ExternalCommandsConfig
 makeLenses ''CommandsConfig
 
 defCommandsConfig :: CommandsConfig
-defCommandsConfig = ExternalCommandsConfig
+defCommandsConfig = CommandsConfig
     { _gyleSsh   = Nothing
     , _giterySsh = Nothing
     , _girarWeb  = Nothing
