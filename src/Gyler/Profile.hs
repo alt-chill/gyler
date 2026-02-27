@@ -16,18 +16,17 @@ module Gyler.Profile (
 --      - Default value (e.g., @defFooConfig@),
 --      - Lenses via Template Haskell (if needed).
 --
--- 2. Update 'GylerProfile' (this file):
+-- 2. Create a new tomland codec under @Gyler.Profile.<Name>.Codec@.
+--
+-- 3. Update 'GylerProfile' (this file):
 --      - Add a new field for the config type,
 --      - Extend 'defProfile' accordingly.
 --
--- 3. Update 'Gyler.Profile' (this file):
+-- 4. Update 'Gyler.Profile' (this file):
 --      - Import the new module,
 --      - Re-export it by adding it to the 'module' export list.
 --
--- This structure ensures that all context types and defaults are easily
--- accessible throughout the application via a single import:
---
--- > import Gyler.Profile
+-- 5. Update @Gyler.Profile.Codec@ with new values.
 
 import Gyler.Profile.Commands
 
