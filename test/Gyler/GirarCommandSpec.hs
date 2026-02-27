@@ -82,12 +82,12 @@ spec = describe "toCmd" $ do
     describe "Missing config cases" $ do
         it "returns error when gyleSsh config is missing" $ do
             let cmd = toCmd profileEmpty (ViaGyle ["something"])
-            cmd `shouldBe` Left "toCmd (ViaGyle): SshConfig is not available"
+            cmd `shouldBe` Left "toCmd (GyleCommand): config not available"
 
         it "returns error when giterySsh config is missing" $ do
             let cmd = toCmd profileEmpty (ViaGitery ["task"])
-            cmd `shouldBe` Left "toCmd (ViaGitery): SshConfig is not available"
+            cmd `shouldBe` Left "toCmd (GiteryCommand): config not available"
 
         it "returns error when girarWeb config is missing" $ do
             let cmd = toCmd profileEmpty (ViaGirarWeb "https://missing.config")
-            cmd `shouldBe` Left "toCmd (ViaGirarWeb): CurlConfig is not available"
+            cmd `shouldBe` Left "toCmd (GirarWebCommand): config not available"

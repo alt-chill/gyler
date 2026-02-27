@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 -- |
 -- Module      : Gyler.FetchSpec.Maintainers
@@ -15,7 +16,7 @@ module Gyler.FetchSpec.MaintainersQuery (
 ) where
 
 import Gyler.FetchSpec (FetchSpec (..))
-import Gyler.GirarCommand (GirarCommand (ViaGitery))
+import Gyler.GirarCommand (pattern ViaGitery)
 
 import Gyler.Utils.List   (safeLast)
 import Gyler.Utils.Maybe  (maybeToRight)

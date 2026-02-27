@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 -- |
 -- Module      : Gyler.FetchSpec.BranchesQuery
@@ -15,7 +16,7 @@ module Gyler.FetchSpec.BranchesQuery (
  ) where
 
 import Gyler.FetchSpec (FetchSpec (..))
-import Gyler.GirarCommand (GirarCommand (ViaGyle))
+import Gyler.GirarCommand (pattern ViaGyle)
 
 import qualified Gyler.Data.NonEmptyText as NET (lines, fromText)
 import Gyler.Data.NonEmptyText.QQ (net)

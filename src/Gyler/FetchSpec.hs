@@ -57,7 +57,7 @@ module Gyler.FetchSpec (
 import Gyler.Data.NonEmptyText (NonEmptyText, fromText)
 
 import Gyler.GylerM (GylerM)
-import Gyler.GirarCommand (GirarCommand, toCmd)
+import Gyler.GirarCommand (SomeGirarCommand, toCmd)
 import Gyler.GirarEnv (GirarEnv)
 import Gyler.Context (girarEnv, profile, commandsConfig, cacheDir)
 
@@ -97,7 +97,7 @@ import Numeric.Natural (Natural)
 class (Serialize (Result e), Eq (Result e), Show (Result e), Show e) => FetchSpec e where
     type Result e = r | r -> e
 
-    command       :: e -> GirarCommand
+    command       :: e -> SomeGirarCommand
     cacheFileName :: e -> FilePath
     staleAfter    :: e -> Natural
     parseResult   :: e -> Maybe GirarEnv -> BS.ByteString -> Either T.Text (Result e)

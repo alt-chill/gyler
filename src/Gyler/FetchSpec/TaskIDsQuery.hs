@@ -10,7 +10,7 @@ module Gyler.FetchSpec.TaskIDsQuery (
 ) where
 
 import Gyler.FetchSpec (FetchSpec (..))
-import Gyler.GirarCommand (GirarCommand (ViaGyle))
+import Gyler.GirarCommand (pattern ViaGyle)
 
 import Gyler.Domain.Maintainer (Maintainer)
 import Gyler.Domain.State      (State)
