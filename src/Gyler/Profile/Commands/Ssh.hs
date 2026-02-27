@@ -8,7 +8,7 @@
 
 module Gyler.Profile.Commands.Ssh (
     SshConfig (SshConfig),
-    sshExecutable, sshArgs, remoteUser,
+    sshExecutable, remoteUser,
     remoteHost, remotePort, authKey,
     defSshConfig
 ) where
@@ -20,7 +20,6 @@ import Gyler.Data.NonEmptyText.QQ (net)
 
 data SshConfig = SshConfig
     { _sshExecutable :: !NonEmptyText
-    , _sshArgs       :: ![NonEmptyText]
     , _remoteUser    :: !NonEmptyText
     , _remoteHost    :: !NonEmptyText
     , _remotePort    :: !(Maybe NonEmptyText)
@@ -32,7 +31,6 @@ makeLenses ''SshConfig
 defSshConfig :: SshConfig
 defSshConfig = SshConfig
     { _sshExecutable = [net|ssh|]
-    , _sshArgs       = []
     , _remoteUser    = [net|user|]
     , _remoteHost    = [net|localhost|]
     , _remotePort    = Nothing

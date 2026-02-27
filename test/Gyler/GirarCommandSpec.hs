@@ -15,7 +15,6 @@ spec :: Spec
 spec = describe "toCmd" $ do
     let fullSshCfg = defSshConfig
             & sshExecutable .~ "ssh"
-            & sshArgs       .~ ["-v"]
             & remoteUser    .~ "alice"
             & remoteHost    .~ "example.com"
             & remotePort    ?~ "2222"
@@ -26,22 +25,18 @@ spec = describe "toCmd" $ do
             & remoteHost .~ "host"
             -- remotePort and authKey remain Nothing
 
-        fullCurlCfg = defCurlConfig
-            & curlExecutable .~ "curl"
-            & curlArgs       .~ ["-f"]
-
-        emptyCurlCfg = defCurlConfig
-            & curlArgs .~ []
+        curlCfg = defCurlConfig
+            & fetchAddress .~ "https://git.altlinux.org"
 
         cmdFull = defCommandsConfig
             & gyleSsh   ?~ fullSshCfg
             & giterySsh ?~ fullSshCfg
-            & girarWeb  ?~ fullCurlCfg
+            & girarWeb  ?~ curlCfg
 
         cmdMinimal = defCommandsConfig
             & gyleSsh   ?~ minimalSshCfg
             & giterySsh ?~ minimalSshCfg
-            & girarWeb  ?~ emptyCurlCfg
+            & girarWeb  ?~ curlCfg
 
         cmdEmpty = defCommandsConfig
             & gyleSsh   .~ Nothing
@@ -60,7 +55,7 @@ spec = describe "toCmd" $ do
     describe "ViaGyle" $ do
         it "constructs full ssh command with args, port, key" $ do
             let cmd = toCmd profileFull (ViaGyle ["do", "thing"])
-            cmd `shouldBe` Right ("ssh", ["-v", "-p", "2222", "-i", "/path/to/key", "alice@example.com", "do", "thing"])
+            cmd `shouldBe` Right ("ssh", ["-p", "2222", "-i", "/path/to/key", "alice@example.com", "do", "thing"])
 
         it "uses default port 22 and no key when not specified" $ do
             let cmd = toCmd profileMinimal (ViaGyle [])
@@ -68,12 +63,12 @@ spec = describe "toCmd" $ do
 
         it "works with empty args" $ do
             let cmd = toCmd profileFull (ViaGyle [])
-            cmd `shouldBe` Right ("ssh", ["-v", "-p", "2222", "-i", "/path/to/key", "alice@example.com"])
+            cmd `shouldBe` Right ("ssh", ["-p", "2222", "-i", "/path/to/key", "alice@example.com"])
 
     describe "ViaGitery" $ do
         it "uses same ssh construction logic as ViaGyle" $ do
             let cmd = toCmd profileFull (ViaGitery ["task", "ls"])
-            cmd `shouldBe` Right ("ssh", ["-v", "-p", "2222", "-i", "/path/to/key", "alice@example.com", "task", "ls"])
+            cmd `shouldBe` Right ("ssh", ["-p", "2222", "-i", "/path/to/key", "alice@example.com", "task", "ls"])
 
         it "works with empty args" $ do
             let cmd = toCmd profileMinimal (ViaGitery [])
@@ -81,11 +76,7 @@ spec = describe "toCmd" $ do
 
     describe "ViaCurl" $ do
         it "constructs curl command with args and target" $ do
-            let cmd = toCmd profileFull (ViaGirarWeb "https://git.altlinux.org/people")
-            cmd `shouldBe` Right ("curl", ["-f", "https://git.altlinux.org/people"])
-
-        it "works without curl extra args" $ do
-            let cmd = toCmd profileMinimal (ViaGirarWeb "https://git.altlinux.org/people")
+            let cmd = toCmd profileFull (ViaGirarWeb "people")
             cmd `shouldBe` Right ("curl", ["https://git.altlinux.org/people"])
 
     describe "Missing config cases" $ do

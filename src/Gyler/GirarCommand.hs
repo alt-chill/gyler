@@ -21,9 +21,9 @@ import Gyler.Context (
     CommandsConfig, Profile,
     commandsConfig,
     giterySsh, gyleSsh, girarWeb,
-    sshExecutable, sshArgs, remoteUser,
+    sshExecutable, remoteUser,
     remoteHost, remotePort, SshConfig (SshConfig),
-    curlExecutable, curlArgs, CurlConfig (CurlConfig)
+    curlExecutable, CurlConfig (CurlConfig)
  )
 import Gyler.Utils.Errors (mkErr)
 import Gyler.Types (Cmd)
@@ -41,40 +41,34 @@ typeName (ViaGyle _)     = "ViaGyle"
 typeName (ViaGitery _)   = "ViaGitery"
 typeName (ViaGirarWeb _) = "ViaGirarWeb"
 
--- | Return argument list.
-argsOf :: GirarCommand -> [NonEmptyText]
-argsOf (ViaGyle args)    = args
-argsOf (ViaGitery args)  = args
-argsOf (ViaGirarWeb arg) = [arg]
-
 -- | Convert SSH configuration into executable command format.
-fromSsh :: Maybe SshConfig -> Either Text Cmd
-fromSsh (Just (SshConfig exec extra user host port key)) =
+fromSsh :: Maybe SshConfig -> [NonEmptyText] -> Either Text Cmd
+fromSsh (Just (SshConfig exec user host port key)) query =
     let userHost = user <> [net|@|] <> host
         portArg  = [[net|-p|], fromMaybe [net|22|] port]
         keyArg   = maybe [] (\k -> [[net|-i|], k]) key
-        args     = extra ++ portArg ++ keyArg ++ [userHost]
-    in Right (exec, args)
-fromSsh Nothing = Left "SshConfig is not available"
+        args     = portArg ++ keyArg ++ [userHost]
+    in Right (exec, args ++ query)
+fromSsh Nothing _ = Left "SshConfig is not available"
 
 -- | Convert curl configuration into executable command format.
-fromCurl :: Maybe CurlConfig -> Either Text Cmd
-fromCurl (Just (CurlConfig exec args)) =
-    Right (exec, args)
-fromCurl Nothing = Left "CurlConfig is not available"
+fromCurl :: Maybe CurlConfig -> NonEmptyText -> Either Text Cmd
+fromCurl (Just (CurlConfig exec address)) endpoint =
+    Right (exec, [address <> NET.singleton '/' <> endpoint] )
+fromCurl Nothing _ = Left "CurlConfig is not available"
 
 -- | Convert a GirarCommand to an executable command using config context.
 toCmd :: Profile -> GirarCommand -> Either Text Cmd
 toCmd profile cmd =
     let cfg = profile ^. commandsConfig in
     case getBaseCmd cfg cmd of
-        Left err           -> Left $ errMsg err
-        Right (exec, args) -> Right (exec, args ++ argsOf cmd)
+        Left err    -> Left $ errMsg err
+        r@(Right _) -> r
   where
     getBaseCmd :: CommandsConfig -> GirarCommand -> Either Text Cmd
     getBaseCmd cfg' = \case
-        ViaGyle _       -> fromSsh  (cfg' ^. gyleSsh)
-        ViaGitery _     -> fromSsh  (cfg' ^. giterySsh)
-        ViaGirarWeb _   -> fromCurl (cfg' ^. girarWeb)
+        ViaGyle query        -> fromSsh  (cfg' ^. gyleSsh)   query
+        ViaGitery query      -> fromSsh  (cfg' ^. giterySsh) query
+        ViaGirarWeb endpoint -> fromCurl (cfg' ^. girarWeb)  endpoint
 
     errMsg = mkErr $ "toCmd (" <> typeName cmd <> ")"

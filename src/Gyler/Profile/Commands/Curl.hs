@@ -7,7 +7,7 @@
 
 module Gyler.Profile.Commands.Curl (
     CurlConfig (CurlConfig),
-    curlExecutable, curlArgs,
+    curlExecutable, fetchAddress,
     defCurlConfig
 ) where
 
@@ -17,14 +17,14 @@ import Gyler.Data.NonEmptyText (NonEmptyText)
 import Gyler.Data.NonEmptyText.QQ (net)
 
 data CurlConfig = CurlConfig
-    { _curlExecutable :: !NonEmptyText
-    , _curlArgs       :: ![NonEmptyText]
+    { _curlExecutable :: !NonEmptyText,
+      _fetchAddress   :: !NonEmptyText
     } deriving (Show, Eq)
 
 makeLenses ''CurlConfig
 
 defCurlConfig :: CurlConfig
 defCurlConfig = CurlConfig
-    { _curlExecutable = [net|curl|]
-    , _curlArgs = []
+    { _curlExecutable = [net|curl|],
+      _fetchAddress   = [net|https://git.altlinux.org|]
     }
